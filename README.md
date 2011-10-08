@@ -11,6 +11,39 @@ may be changed to support the standardized format discussed in
 [Issue 34: Command line tool][] and I cannot say that the tool keeps
 backward compatibilities with obsolete formats.
 
+Installation
+------------
+
+Download snzip-0.0.1.tar.gz from https://github.com/kubo/snzip,
+uncompress and untar it, and run configure.
+
+    tar xvfz snzip-0.0.1.tar.gz
+    cd snzip-0.0.1
+    ./configure
+
+If you didn't install snappy under /usr or /usr/local, you need to specify
+the location by '--with-snappy' as follows.
+
+    # insall snappy
+    tar xvfz snappy-1.0.4.tar.gz
+    cd snappy-1.0.4
+    ./configure --prefix=/usr/local/snappy
+    make
+    make install
+    cd ..
+    
+    # install snzip
+    tar xvfz snzip-0.0.1.tar.gz
+    cd snzip-0.0.1
+    ./configure --with-snappy=/usr/local/snappy
+
+To use source code in the github repository.
+
+    git clone git://github.com/kubo/snzip.git
+    cd snzip
+    ./autogen.sh
+    ./configure
+
 Usage
 -----
 
@@ -23,18 +56,19 @@ Timestamp, mode and permissions are not changed as possible as it can.
 
 ### To compress file.tar and output to standard out.
 
-  snzip -c file.tar > file.tar.snz
+    snzip -c file.tar > file.tar.snz
 
 or
 
-  cat file.tar | snzip > file.tar.snz
+    cat file.tar | snzip > file.tar.snz
 
 ### To uncompress file.tar.snz:
 
-  snzip -d file.tar.snz
+    snzip -d file.tar.snz
+
 or
 
-  snunzip file.tar.snz
+    snunzip file.tar.snz
 
 Uncompressed file name is 'file.tar' and the original file is deleted.
 Timestamp, mode and permissions are not changed as possible as it can.
@@ -43,10 +77,10 @@ If the program name includes 'un' such as snunzip, it acts as '-d' is set.
 
 ### To uncompress file.tar.snz and output to standard out.
 
-  snzip -dc file.tar.snz > file.tar
-  snunzip -c file.tar.snz > file.tar
-  snzcat file.tar.snz > file.tar
-  cat file.tar.snz | snzcat > file.tar
+    snzip -dc file.tar.snz > file.tar
+    snunzip -c file.tar.snz > file.tar
+    snzcat file.tar.snz > file.tar
+    cat file.tar.snz | snzcat > file.tar
 
 If the program name includes 'cat' such as snzcat, it acts as '-dc' is set.
 
