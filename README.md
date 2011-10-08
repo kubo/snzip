@@ -49,7 +49,7 @@ Usage
 
 ### To compress file.tar:
 
-  snzip file.tar
+    snzip file.tar
 
 Compressed file name is 'file.tar.snz' and the original file is deleted.
 Timestamp, mode and permissions are not changed as possible as it can.
