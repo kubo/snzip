@@ -5,6 +5,8 @@ What is snzip.
 --------------
 
 Snzip is one of command line tools using [snappy][].
+This supports three type of file formats; snzip format, [snappy-java][]
+format and [snappy-in-java][] format. The default format is snzip.
 
 Note that this tool's status is *experimental*. The file format
 may be changed to support the standardized format discussed in
@@ -14,11 +16,11 @@ backward compatibilities with obsolete formats.
 Installation
 ------------
 
-Download snzip-0.0.1.tar.gz from https://github.com/kubo/snzip,
+Download snzip-0.0.2.tar.gz from https://github.com/kubo/snzip,
 uncompress and untar it, and run configure.
 
-    tar xvfz snzip-0.0.1.tar.gz
-    cd snzip-0.0.1
+    tar xvfz snzip-0.0.2.tar.gz
+    cd snzip-0.0.2
     ./configure
 
 If you didn't install snappy under /usr or /usr/local, you need to specify
@@ -33,8 +35,8 @@ the location by '--with-snappy' as follows.
     cd ..
     
     # install snzip
-    tar xvfz snzip-0.0.1.tar.gz
-    cd snzip-0.0.1
+    tar xvfz snzip-0.0.2.tar.gz
+    cd snzip-0.0.2
     ./configure --with-snappy=/usr/local/snappy
 
 To use source code in the github repository.
@@ -54,6 +56,15 @@ Usage
 Compressed file name is 'file.tar.snz' and the original file is deleted.
 Timestamp, mode and permissions are not changed as possible as it can.
 
+The file format is SNZ. You need to add an option '-t snappy-java' or
+'-t snappy-in-java' to use other formats.
+
+    snzip -t snappy-java file.tar
+
+or
+
+    snzip -t snappy-in-java file.tar
+
 ### To compress file.tar and output to standard out.
 
     snzip -c file.tar > file.tar.snz
@@ -61,6 +72,9 @@ Timestamp, mode and permissions are not changed as possible as it can.
 or
 
     cat file.tar | snzip > file.tar.snz
+
+You need to add an option '-t [format-name]' to use formats except SNZ.
+
 
 ### To uncompress file.tar.snz:
 
@@ -75,6 +89,8 @@ Timestamp, mode and permissions are not changed as possible as it can.
 
 If the program name includes 'un' such as snunzip, it acts as '-d' is set.
 
+The file format is automatically determined from the first byte of the file.
+
 ### To uncompress file.tar.snz and output to standard out.
 
     snzip -dc file.tar.snz > file.tar
@@ -84,8 +100,8 @@ If the program name includes 'un' such as snunzip, it acts as '-d' is set.
 
 If the program name includes 'cat' such as snzcat, it acts as '-dc' is set.
 
-File format
------------
+SNZ File format
+---------------
 
 The first three bytes are magic characters 'SNZ'.
 
@@ -109,9 +125,10 @@ less than or equal to the block size specified by the fifth byte.
 License
 -------
 
-[2-clause BSD-style license][]
+2-clause BSD-style license.
 
 [snappy]: http://code.google.com/p/snappy/
 [Issue 34: Command line tool]: http://code.google.com/p/snappy/issues/detail?id=34
 [snappy::Varint::Encode32()]: http://code.google.com/p/snappy/source/browse/trunk/snappy-stubs-internal.h?r=51#461
-[2-clause BSD-style license]: http://en.wikipedia.org/wiki/BSD_licenses#2-clause_license_.28.22Simplified_BSD_License.22_or_.22FreeBSD_License.22.29
+[snappy-java]; http://code.google.com/p/snappy-java/
+[snappy-in-java]; https://github.com/dain/snappy

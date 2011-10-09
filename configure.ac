@@ -1,5 +1,5 @@
 AC_PREREQ(2.50)
-AC_INIT([snzip], [0.0.1])
+AC_INIT([snzip], [0.0.2])
 
 AM_INIT_AUTOMAKE
 
@@ -7,7 +7,7 @@ AM_INIT_AUTOMAKE
 AC_PROG_CC
 
 if test "$GCC"; then
-   CFLAGS="$CFLAGS -Wall -Werror"
+   CFLAGS="$CFLAGS -Wall"
 fi
 
 AC_CHECK_HEADERS([unistd.h])
