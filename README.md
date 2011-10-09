@@ -130,5 +130,5 @@ License
 [snappy]: http://code.google.com/p/snappy/
 [Issue 34: Command line tool]: http://code.google.com/p/snappy/issues/detail?id=34
 [snappy::Varint::Encode32()]: http://code.google.com/p/snappy/source/browse/trunk/snappy-stubs-internal.h?r=51#461
-[snappy-java]; http://code.google.com/p/snappy-java/
-[snappy-in-java]; https://github.com/dain/snappy
+[snappy-java]: http://code.google.com/p/snappy-java/
+[snappy-in-java]: https://github.com/dain/snappy
