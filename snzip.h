@@ -86,5 +86,6 @@ typedef struct {
 extern stream_format_t snzip_format;
 extern stream_format_t snappy_java_format;
 extern stream_format_t snappy_in_java_format;
+extern stream_format_t comment_43_format;
 
 #endif /* SNZIP_H */

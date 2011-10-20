@@ -78,6 +78,7 @@ static stream_format_t *stream_formats[] = {
   &snzip_format,
   &snappy_java_format,
   &snappy_in_java_format,
+  &comment_43_format,
 };
 #define NUM_OF_STREAM_FORMATS (sizeof(stream_formats)/sizeof(stream_formats[0]))
 
