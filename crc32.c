@@ -44,7 +44,11 @@
  * CRC32 code derived from work by Gary S. Brown.
  */
 #include <stdlib.h>
+#ifndef __APPLE__
 #include <endian.h>
+#else
+#include <architecture/byte_order.h>
+#endif
 #include "crc32.h"
 
 uint32_t crc32_tab[] = {
