@@ -1,10 +1,13 @@
-AC_PREREQ(2.50)
+# The autoconf version must be at least 2.64 to correctly detect
+# endianess of Mac OS X univesal binary.
+AC_PREREQ(2.64)
 AC_INIT([snzip], [0.0.2])
 
 AM_INIT_AUTOMAKE
 
 # These are flags passed to automake (though they look like gcc flags!)
 AC_PROG_CC
+AC_C_BIGENDIAN
 
 if test "$GCC"; then
    CFLAGS="$CFLAGS -Wall"
