@@ -23,3 +23,17 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The views and conclusions contained in the software and documentation are those of the
 authors and should not be interpreted as representing official policies, either expressed
 or implied, of the authors.
+
+
+======================================================================
+Copyright of crc32.c, which copied from src/sys/libkern/crc32.c in FreeBSD CVS repository:
+
+  COPYRIGHT (C) 1986 Gary S. Brown.  You may use this program, or
+  code or tables extracted from it, as desired without restriction.
+
+and
+
+  Copyright (c) 2004-2006 Intel Corporation - All Rights Reserved
+
+  This software program is licensed subject to the BSD License, available at
+  http://www.opensource.org/licenses/bsd-license.html.
