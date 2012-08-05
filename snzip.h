@@ -43,12 +43,37 @@
 #define FALSE 0
 #endif
 
-#ifndef fputc_unlocked
-#define fputc_unlocked fputc
+/* unlocked stdio functions */
+#if defined _IO_getc_unlocked
+#define getc_unlocked _IO_getc_unlocked
+#elif !defined HAVE_GETC_UNLOCKED
+#define getc_unlocked getc
 #endif
 
-#ifndef fgetc_unlocked
-#define fgetc_unlocked fgetc
+#if defined _IO_putc_unlocked
+#define putc_unlocked _IO_putc_unlocked
+#elif !defined HAVE_PUTC_UNLOCKED
+#define putc_unlocked putc
+#endif
+
+#if !defined HAVE_FREAD_UNLOCKED
+#define fread_unlocked fread
+#endif
+
+#if !defined HAVE_FWRITE_UNLOCKED
+#define fwrite_unlocked fwrite
+#endif
+
+#if defined _IO_ferror_unlocked
+#define ferror_unlocked _IO_ferror_unlocked
+#elif !defined HAVE_FERROR_UNLOCKED
+#define ferror_unlocked ferror
+#endif
+
+#if defined _IO_feof_unlocked
+#define feof_unlocked _IO_feof_unlocked
+#elif !defined HAVE_FEOF_UNLOCKED
+#define feof_unlocked feof
 #endif
 
 /* logging functions */

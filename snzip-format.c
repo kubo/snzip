@@ -88,14 +88,14 @@ static int snzip_compress(FILE *infp, FILE *outfp, size_t block_size)
   header.version = SNZ_FILE_VERSION;
   header.block_size = nshift;
 
-  if (fwrite(&header, sizeof(header), 1, outfp) != 1) {
+  if (fwrite_unlocked(&header, sizeof(header), 1, outfp) != 1) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     goto cleanup;
   }
 
   /* write file body */
   work_buffer_init(&wb, block_size);
-  while ((uncompressed_length = fread(wb.uc, 1, wb.uclen, infp)) > 0) {
+  while ((uncompressed_length = fread_unlocked(wb.uc, 1, wb.uclen, infp)) > 0) {
     size_t compressed_length = wb.clen;
 
     trace("read %lu bytes.\n", (unsigned long)uncompressed_length);
@@ -106,45 +106,45 @@ static int snzip_compress(FILE *infp, FILE *outfp, size_t block_size)
 
     /* write the compressed length. */
     if (compressed_length < (1ul << 7)) {
-      fputc_unlocked(compressed_length, outfp);
+      putc_unlocked(compressed_length, outfp);
       trace("write 1 byte for compressed data length.\n");
     } else if (compressed_length < (1ul << 14)) {
-      fputc_unlocked((compressed_length >> 0) | 0x80, outfp);
-      fputc_unlocked((compressed_length >> 7), outfp);
+      putc_unlocked((compressed_length >> 0) | 0x80, outfp);
+      putc_unlocked((compressed_length >> 7), outfp);
       trace("write 2 bytes for compressed data length.\n");
     } else if (compressed_length < (1ul << 21)) {
-      fputc_unlocked((compressed_length >> 0) | 0x80, outfp);
-      fputc_unlocked((compressed_length >> 7) | 0x80, outfp);
-      fputc_unlocked((compressed_length >> 14), outfp);
+      putc_unlocked((compressed_length >> 0) | 0x80, outfp);
+      putc_unlocked((compressed_length >> 7) | 0x80, outfp);
+      putc_unlocked((compressed_length >> 14), outfp);
       trace("write 3 bytes for compressed data length.\n");
     } else if (compressed_length < (1ul << 28)) {
-      fputc_unlocked((compressed_length >> 0) | 0x80, outfp);
-      fputc_unlocked((compressed_length >> 7) | 0x80, outfp);
-      fputc_unlocked((compressed_length >> 14)| 0x80, outfp);
-      fputc_unlocked((compressed_length >> 21), outfp);
+      putc_unlocked((compressed_length >> 0) | 0x80, outfp);
+      putc_unlocked((compressed_length >> 7) | 0x80, outfp);
+      putc_unlocked((compressed_length >> 14)| 0x80, outfp);
+      putc_unlocked((compressed_length >> 21), outfp);
       trace("write 4 bytes for compressed data length.\n");
     } else {
-      fputc_unlocked((compressed_length >> 0) | 0x80, outfp);
-      fputc_unlocked((compressed_length >> 7) | 0x80, outfp);
-      fputc_unlocked((compressed_length >> 14)| 0x80, outfp);
-      fputc_unlocked((compressed_length >> 21)| 0x80, outfp);
-      fputc_unlocked((compressed_length >> 28), outfp);
+      putc_unlocked((compressed_length >> 0) | 0x80, outfp);
+      putc_unlocked((compressed_length >> 7) | 0x80, outfp);
+      putc_unlocked((compressed_length >> 14)| 0x80, outfp);
+      putc_unlocked((compressed_length >> 21)| 0x80, outfp);
+      putc_unlocked((compressed_length >> 28), outfp);
       trace("write 5 bytes for compressed data length.\n");
     }
 
     /* write the compressed data. */
-    if (fwrite(wb.c, compressed_length, 1, outfp) != 1) {
+    if (fwrite_unlocked(wb.c, compressed_length, 1, outfp) != 1) {
       print_error("Failed to write a file: %s\n", strerror(errno));
       goto cleanup;
     }
     trace("write %ld bytes for compressed data.\n", (long)compressed_length);
   }
-  if (!feof(infp)) {
-    /* fread() failed. */
+  if (!feof_unlocked(infp)) {
+    /* fread_unlocked() failed. */
     print_error("Failed to read a file: %s\n", strerror(errno));
     goto cleanup;
   }
-  fputc_unlocked('\0', outfp);
+  putc_unlocked('\0', outfp);
   trace("write 1 byte\n");
   err = 0;
  cleanup:
@@ -163,7 +163,7 @@ static int snzip_uncompress(FILE *infp, FILE *outfp)
   wb.uc = NULL;
 
   /* read header */
-  if (fread(&header, sizeof(header), 1, infp) != 1) {
+  if (fread_unlocked(&header, sizeof(header), 1, infp) != 1) {
     print_error("Failed to read a file: %s\n", strerror(errno));
     goto cleanup;
   }
@@ -197,7 +197,7 @@ static int snzip_uncompress(FILE *infp, FILE *outfp)
     int idx;
 
     for (idx = 0; idx < VARINT_MAX; idx++) {
-      int chr = fgetc_unlocked(infp);
+      int chr = getc_unlocked(infp);
       if (chr == -1) {
         print_error("Unexpected end of file.\n");
         goto cleanup;
@@ -223,8 +223,8 @@ static int snzip_uncompress(FILE *infp, FILE *outfp)
     }
 
     /* read the compressed data */
-    if (fread(wb.c, compressed_length, 1, infp) != 1) {
-      if (feof(infp)) {
+    if (fread_unlocked(wb.c, compressed_length, 1, infp) != 1) {
+      if (feof_unlocked(infp)) {
         print_error("Unexpected end of file\n");
       } else {
         print_error("Failed to read a file: %s\n", strerror(errno));

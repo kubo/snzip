@@ -7,6 +7,7 @@ AM_INIT_AUTOMAKE
 
 # These are flags passed to automake (though they look like gcc flags!)
 AC_PROG_CC
+AC_GNU_SOURCE
 AC_C_BIGENDIAN
 
 if test "$GCC"; then
@@ -22,6 +23,9 @@ AC_CHECK_MEMBERS([struct stat.st_mtimensec, struct stat.st_mtim.tv_nsec, struct 
 #include <sys/stat.h>
 #include <unistd.h>
 ]])
+
+# unlocked stdio functions
+AC_CHECK_FUNCS(getc_unlocked putc_unlocked fread_unlocked fwrite_unlocked ferror_unlocked feof_unlocked)
 
 # introduce the optional configure parameter for a non-standard install prefix of snappy
 AC_ARG_WITH([snappy],

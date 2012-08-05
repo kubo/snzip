@@ -106,7 +106,7 @@ static stream_format_t *find_stream_format_by_suffix(const char *suffix)
 
 static stream_format_t *find_stream_format_by_first_byte(FILE *fp)
 {
-  int c = fgetc_unlocked(fp);
+  int c = getc_unlocked(fp);
   int idx;
   if (c == -1) {
     fprintf(stderr, "Unexpected EOF\n");
