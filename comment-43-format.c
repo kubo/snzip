@@ -40,7 +40,7 @@
 #include "crc32.h"
 
 #define MAGIC "snappy"
-#define MAGIC_LEN 6
+#define MAGIC_LEN 6u
 
 #define COMPRESSED_TYPE_CODE 0x00
 #define UNCOMPRESSED_TYPE_CODE 0x01
@@ -87,7 +87,7 @@ static int comment_43_compress(FILE *infp, FILE *outfp, size_t block_size)
 
   putc_unlocked(HEADER_TYPE_CODE, outfp);
   putc_unlocked(MAGIC_LEN, outfp);
-  putc_unlocked(MAGIC_LEN << 8, outfp);
+  putc_unlocked(MAGIC_LEN >> 8, outfp);
   fwrite_unlocked(MAGIC, MAGIC_LEN, 1, outfp);
 
   /* write file body */
