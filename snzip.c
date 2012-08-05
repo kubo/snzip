@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil -*-
  *
- * Copyright 2011 Kubo Takehiro <kubo@jiubao.org>
+ * Copyright 2011-2012 Kubo Takehiro <kubo@jiubao.org>
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -155,6 +155,7 @@ int main(int argc, char **argv)
 {
   int opt;
   int opt_uncompress = FALSE;
+  int opt_keep = FALSE;
   int opt_stdout = FALSE;
   int block_size = 0;
   size_t rsize = 0;
@@ -178,15 +179,20 @@ int main(int argc, char **argv)
     trace("\"cat\" is found in %s\n", progname);
     opt_stdout = TRUE;
     opt_uncompress = TRUE;
+    opt_keep = TRUE;
   }
 
-  while ((opt = getopt(argc, argv, "cdt:hb:B:R:W:T")) != -1) {
+  while ((opt = getopt(argc, argv, "cdkt:hb:B:R:W:T")) != -1) {
     switch (opt) {
     case 'c':
       opt_stdout = TRUE;
+      opt_keep = TRUE;
       break;
     case 'd':
       opt_uncompress = TRUE;
+      break;
+    case 'k':
+      opt_keep = TRUE;
       break;
     case 't':
       format_name = optarg;
@@ -351,7 +357,7 @@ int main(int argc, char **argv)
       fclose(outfp);
     }
 
-    if (!opt_stdout) {
+    if (!opt_keep) {
       int rv = unlink(infile);
       trace("unlink(\"%s\") => %d (errno = %d)\n",
             infile, rv, rv ? errno : 0);
@@ -441,6 +447,7 @@ static void show_usage(const char *progname, int exit_code)
           "  general options:\n"
           "   -c       output to standard output, keep original files unchanged\n"
           "   -d       decompress\n"
+          "   -k       keep (don't delete) input files\n"
           "   -t name  file format name. see below.\n"
           "   -h       give this help\n"
           "\n"
@@ -466,6 +473,7 @@ static void show_usage(const char *progname, int exit_code)
     }
   }
   fprintf(stderr, "    %*s  %*s  URL\n", -max_name_len, "NAME", -max_suffix_len, "SUFFIX");
+  fprintf(stderr, "    %*s  %*s  ---\n", -max_name_len, "----", -max_suffix_len, "------");
   for (idx = 0; idx < NUM_OF_STREAM_FORMATS; idx++) {
     stream_format_t *fmt = stream_formats[idx];
     fprintf(stderr, "    %*s  %*s  %s\n", -max_name_len, fmt->name, -max_suffix_len, fmt->suffix, fmt->url);
