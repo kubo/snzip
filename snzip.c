@@ -76,6 +76,7 @@ static void show_usage(const char *progname, int exit_code);
 
 static stream_format_t *stream_formats[] = {
   &snzip_format,
+  &snappy_framed_format,
   &snappy_java_format,
   &snappy_in_java_format,
   &comment_43_format,

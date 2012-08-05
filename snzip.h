@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil -*-
  *
- * Copyright 2011 Kubo Takehiro <kubo@jiubao.org>
+ * Copyright 2011-2012 Kubo Takehiro <kubo@jiubao.org>
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -109,6 +109,7 @@ typedef struct {
 } stream_format_t;
 
 extern stream_format_t snzip_format;
+extern stream_format_t snappy_framed_format;
 extern stream_format_t snappy_java_format;
 extern stream_format_t snappy_in_java_format;
 extern stream_format_t comment_43_format;
