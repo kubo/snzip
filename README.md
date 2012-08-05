@@ -5,13 +5,14 @@ What is snzip.
 --------------
 
 Snzip is one of command line tools using [snappy][].
-This supports three type of file formats; snzip format, [snappy-java][]
-format and [snappy-in-java][] format. The default format is snzip.
+This supports four type of file formats; snzip format,
+[snappy-framed][] format [snappy-java][] format and [snappy-in-java][]
+format. The default format is snzip.
 
-Note that this tool's status is *experimental*. The file format
-may be changed to support the standardized format discussed in
-[Issue 34: Command line tool][] and I cannot say that the tool keeps
-backward compatibilities with obsolete formats.
+Note that the default format is changed to [snappy-framed][] when
+the program name includes "snappy." If you want to use snzip
+as a [snappy-framed][] compressor/decompressor, rename snzip
+to snappy, unsnappy or so.
 
 Installation
 ------------
@@ -128,6 +129,7 @@ License
 2-clause BSD-style license.
 
 [snappy]: http://code.google.com/p/snappy/
+[snappy-framed]: http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=55
 [Issue 34: Command line tool]: http://code.google.com/p/snappy/issues/detail?id=34
 [snappy::Varint::Encode32()]: http://code.google.com/p/snappy/source/browse/trunk/snappy-stubs-internal.h?r=51#461
 [snappy-java]: http://code.google.com/p/snappy-java/
