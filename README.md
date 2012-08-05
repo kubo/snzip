@@ -17,11 +17,11 @@ to snappy, unsnappy or so.
 Installation
 ------------
 
-Download snzip-0.0.2.tar.gz from https://github.com/kubo/snzip,
+Download snzip-0.9.0.tar.gz from https://github.com/kubo/snzip,
 uncompress and untar it, and run configure.
 
-    tar xvfz snzip-0.0.2.tar.gz
-    cd snzip-0.0.2
+    tar xvfz snzip-0.9.0.tar.gz
+    cd snzip-0.9.0
     ./configure
 
 If you didn't install snappy under /usr or /usr/local, you need to specify
@@ -36,8 +36,8 @@ the location by '--with-snappy' as follows.
     cd ..
     
     # install snzip
-    tar xvfz snzip-0.0.2.tar.gz
-    cd snzip-0.0.2
+    tar xvfz snzip-0.9.0.tar.gz
+    cd snzip-0.9.0
     ./configure --with-snappy=/usr/local/snappy
 
 To use source code in the github repository.
