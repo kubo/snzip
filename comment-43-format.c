@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil -*-
  *
- * Copyright 2011 Kubo Takehiro <kubo@jiubao.org>
+ * Copyright 2011-2012 Kubo Takehiro <kubo@jiubao.org>
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -148,13 +148,13 @@ static int comment_43_compress(FILE *infp, FILE *outfp, size_t block_size)
 }
 
 
-static int comment_43_uncompress(FILE *infp, FILE *outfp)
+static int comment_43_uncompress(FILE *infp, FILE *outfp, int skip_magic)
 {
   block_data_t *block_data = malloc(sizeof(block_data_t));
   size_t work_len = snappy_max_compressed_length(UINT16_MAX); /* length of worst case */
   char *work = malloc(work_len);
   int err = 1;
-  stream_state_t state = INITIAL_STATE;
+  stream_state_t state = skip_magic ? PROCESSING_STATE : INITIAL_STATE;
 
   if (block_data == NULL || work == NULL) {
     print_error("out of memory\n");
@@ -314,7 +314,8 @@ stream_format_t comment_43_format = {
   "comment-43",
   "http://code.google.com/p/snappy/issues/detail?id=34#c43",
   "snappy",
-  HEADER_TYPE_CODE,
+  "\xff\x06\x00" MAGIC,
+  3 + MAGIC_LEN,
   comment_43_compress,
   comment_43_uncompress,
 };

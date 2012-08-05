@@ -105,22 +105,34 @@ static stream_format_t *find_stream_format_by_suffix(const char *suffix)
   return NULL;
 }
 
-static stream_format_t *find_stream_format_by_first_byte(FILE *fp)
+static stream_format_t *find_stream_format_by_file_header(FILE *fp)
 {
-  int c = getc_unlocked(fp);
-  int idx;
-  if (c == -1) {
-    fprintf(stderr, "Unexpected EOF\n");
-    return NULL;
-  }
-  ungetc(c, fp);
+  char buf[FILE_HEADER_LENGTH_MAX];
+  int len = 0, idx;
 
-  for (idx = 0; idx < NUM_OF_STREAM_FORMATS; idx++) {
-    if ((int)stream_formats[idx]->first_byte == c) {
-      return stream_formats[idx];
+  while (len < FILE_HEADER_LENGTH_MAX) {
+    int c = getc_unlocked(fp);
+    if (c == -1) {
+      fprintf(stderr, "Unexpected EOF\n");
+      return NULL;
+    }
+    buf[len++] = c;
+    for (idx = 0; idx < NUM_OF_STREAM_FORMATS; idx++) {
+      stream_format_t *fmt = stream_formats[idx];
+      if (fmt->file_header_length == len) {
+        trace("compare magic with %s.\n", fmt->name);
+        if (memcmp(fmt->file_header, buf, len) == 0) {
+          trace("%s is found.\n", fmt->name);
+          return fmt;
+        }
+      }
     }
   }
-  fprintf(stderr, "Unknown file header 0x%02x\n", c);
+  fprintf(stderr, "Unknown file header:");
+  for (idx = 0; idx < len; idx++) {
+    fprintf(stderr, " 0x%02x", (unsigned char)buf[idx]);
+  }
+  putc('\n', stderr);
   return NULL;
 }
 
@@ -245,13 +257,15 @@ int main(int argc, char **argv)
     }
 
     if (opt_uncompress) {
+      int skip_magic = 0;
       if (format_name == NULL) {
-        fmt = find_stream_format_by_first_byte(stdin);
+        fmt = find_stream_format_by_file_header(stdin);
         if (fmt == NULL) {
           return 1;
         }
+        skip_magic = 1;
       }
-      return fmt->uncompress(stdin, stdout);
+      return fmt->uncompress(stdin, stdout, skip_magic);
     } else {
       return fmt->compress(stdin, stdout, block_size);
     }
@@ -263,6 +277,7 @@ int main(int argc, char **argv)
     char outfile[PATH_MAX];
     FILE *infp;
     FILE *outfp;
+    int skip_magic = 0;
 
     /* check input file and open it. */
     const char *suffix = strrchr(infile, '.');
@@ -293,10 +308,11 @@ int main(int argc, char **argv)
 
     /* determine the file format */
     if (opt_uncompress) {
-      fmt = find_stream_format_by_first_byte(infp);
+      fmt = find_stream_format_by_file_header(infp);
       if (fmt == NULL) {
         exit(1);
       }
+      skip_magic = 1;
     }
 
     /* check output file and open it. */
@@ -332,7 +348,7 @@ int main(int argc, char **argv)
 
     if (opt_uncompress) {
       trace("uncompress %s\n", infile);
-      if (fmt->uncompress(infp, outfp) != 0) {
+      if (fmt->uncompress(infp, outfp, skip_magic) != 0) {
         if (outfp != stdout) {
           unlink(outfile);
         }

@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil -*-
  *
- * Copyright 2011 Kubo Takehiro <kubo@jiubao.org>
+ * Copyright 2011-2012 Kubo Takehiro <kubo@jiubao.org>
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -143,7 +143,7 @@ static int write_block(FILE *outfp, const char *buffer, size_t length, int compr
   return 0;
 }
 
-static int snappy_in_java_uncompress(FILE *infp, FILE *outfp)
+static int snappy_in_java_uncompress(FILE *infp, FILE *outfp, int skip_magic)
 {
   snappy_in_java_header_t header;
   work_buffer_t wb;
@@ -153,16 +153,18 @@ static int snappy_in_java_uncompress(FILE *infp, FILE *outfp)
   wb.c = NULL;
   wb.uc = NULL;
 
-  /* read header */
-  if (fread_unlocked(&header, sizeof(header), 1, infp) != 1) {
-    print_error("Failed to read a file: %s\n", strerror(errno));
-    goto cleanup;
-  }
+  if (!skip_magic) {
+    /* read header */
+    if (fread_unlocked(&header, sizeof(header), 1, infp) != 1) {
+      print_error("Failed to read a file: %s\n", strerror(errno));
+      goto cleanup;
+    }
 
-  /* check header */
-  if (memcmp(header.magic, SNAPPY_IN_JAVA_MAGIC, SNAPPY_IN_JAVA_MAGIC_LEN) != 0) {
-    print_error("This is not a snappy-java file.\n");
-    goto cleanup;
+    /* check header */
+    if (memcmp(header.magic, SNAPPY_IN_JAVA_MAGIC, SNAPPY_IN_JAVA_MAGIC_LEN) != 0) {
+      print_error("This is not a snappy-java file.\n");
+      goto cleanup;
+    }
   }
 
   /* Use a file descriptor 'outfd' instead of the stdio file pointer 'outfp'
@@ -278,7 +280,8 @@ stream_format_t snappy_in_java_format = {
   "snappy-in-java",
   "https://github.com/dain/snappy",
   "snappy",
-  's',
+  SNAPPY_IN_JAVA_MAGIC,
+  SNAPPY_IN_JAVA_MAGIC_LEN,
   snappy_in_java_compress,
   snappy_in_java_uncompress,
 };

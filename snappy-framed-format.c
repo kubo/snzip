@@ -155,7 +155,7 @@ static int check_crc32c(const char *data, size_t datalen, const char *checksum)
   return 0;
 }
 
-static int snappy_framed_format_uncompress(FILE *infp, FILE *outfp)
+static int snappy_framed_format_uncompress(FILE *infp, FILE *outfp, int skip_magic)
 {
   const size_t max_data_len = MAX_DATA_LEN;
   const size_t max_uncompressed_data_len = MAX_UNCOMPRESSED_DATA_LEN;
@@ -170,13 +170,15 @@ static int snappy_framed_format_uncompress(FILE *infp, FILE *outfp)
     goto cleanup;
   }
 
-  /* write the steam header */
-  if (read_data(data, sizeof(stream_header), infp) != 0) {
-    goto cleanup;
-  }
-  if (memcmp(data, stream_header, sizeof(stream_header)) != 0) {
-    print_error("Invalid stream identfier\n");
-    goto cleanup;
+  if (!skip_magic) {
+    /* read the steam header */
+    if (read_data(data, sizeof(stream_header), infp) != 0) {
+      goto cleanup;
+    }
+    if (memcmp(data, stream_header, sizeof(stream_header)) != 0) {
+      print_error("Invalid stream identfier\n");
+      goto cleanup;
+    }
   }
 
   for (;;) {
@@ -254,7 +256,8 @@ stream_format_t snappy_framed_format = {
   "snappy-framed",
   "http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=55",
   "sz",
-  0xff,
+  stream_header,
+  sizeof(stream_header),
   snappy_framed_format_compress,
   snappy_framed_format_uncompress,
 };

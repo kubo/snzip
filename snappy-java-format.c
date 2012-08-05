@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil -*-
  *
- * Copyright 2011 Kubo Takehiro <kubo@jiubao.org>
+ * Copyright 2011-2012 Kubo Takehiro <kubo@jiubao.org>
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -109,7 +109,7 @@ static int snappy_java_compress(FILE *infp, FILE *outfp, size_t block_size)
   return err;
 }
 
-static int snappy_java_uncompress(FILE *infp, FILE *outfp)
+static int snappy_java_uncompress(FILE *infp, FILE *outfp, int skip_magic)
 {
   snappy_java_header_t header;
   work_buffer_t wb;
@@ -119,18 +119,27 @@ static int snappy_java_uncompress(FILE *infp, FILE *outfp)
   wb.c = NULL;
   wb.uc = NULL;
 
-  /* read header */
-  if (fread_unlocked(&header, sizeof(header), 1, infp) != 1) {
-    print_error("Failed to read a file: %s\n", strerror(errno));
-    goto cleanup;
+  if (skip_magic) {
+    /* read header except magic */
+    if (fread_unlocked(&header.version, sizeof(header) - sizeof(header.magic), 1, infp) != 1) {
+      print_error("Failed to read a file: %s\n", strerror(errno));
+      goto cleanup;
+    }
+  } else {
+    /* read header */
+    if (fread_unlocked(&header, sizeof(header), 1, infp) != 1) {
+      print_error("Failed to read a file: %s\n", strerror(errno));
+      goto cleanup;
+    }
+
+    /* check magic */
+    if (memcmp(header.magic, SNAPPY_JAVA_MAGIC, SNAPPY_JAVA_MAGIC_LEN) != 0) {
+      print_error("This is not a snappy-java file.\n");
+      goto cleanup;
+    }
   }
 
-  /* check header */
-  if (memcmp(header.magic, SNAPPY_JAVA_MAGIC, SNAPPY_JAVA_MAGIC_LEN) != 0) {
-    print_error("This is not a snappy-java file.\n");
-    goto cleanup;
-  }
-
+  /* check rest header */
   header.version = ntohl(header.version);
   if (header.version != SNAPPY_JAVA_FILE_VERSION) {
     print_error("Unknown snappy-java version %d\n", header.version);
@@ -222,7 +231,8 @@ stream_format_t snappy_java_format = {
   "snappy-java",
   "http://code.google.com/p/snappy-java/",
   "snappy",
-  '\x82',
+  SNAPPY_JAVA_MAGIC,
+  SNAPPY_JAVA_MAGIC_LEN,
   snappy_java_compress,
   snappy_java_uncompress,
 };
