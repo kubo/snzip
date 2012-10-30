@@ -27,7 +27,7 @@ uncompress and untar it, and run configure.
 If you didn't install snappy under /usr or /usr/local, you need to specify
 the location by '--with-snappy' as follows.
 
-    # insall snappy
+    # install snappy
     tar xvfz snappy-1.0.4.tar.gz
     cd snappy-1.0.4
     ./configure --prefix=/usr/local/snappy
