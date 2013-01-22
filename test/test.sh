@@ -18,7 +18,16 @@ run_test() {
 
         echo compress $testfile
         $SNZIP -t $format -c $TESTDIR/plain/$testfile > $TESTDIR/$testfile.tmp.$ext
-        cmp $TESTDIR/$testfile.tmp.$ext $TESTDIR/$format/$testfile.$ext
+        status=
+        for f in $TESTDIR/$format/$testfile.$ext*; do
+            if cmp $TESTDIR/$testfile.tmp.$ext $f >/dev/null 2>&1; then
+                status=OK
+            fi
+        done
+        if ! test "$status"; then
+            echo "$TESTDIR/$testfile.tmp.$ext doesn't match: `echo $TESTDIR/$format/$testfile.$ext*`"
+            exit 1
+        fi
 
         echo uncompress $testfile.tmp.$ext without autodetect
         cat $TESTDIR/$testfile.tmp.$ext | $SNZIP -t $format -d > $TESTDIR/$testfile.tmp
