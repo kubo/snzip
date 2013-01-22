@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil -*-
  *
- * Copyright 2011-2012 Kubo Takehiro <kubo@jiubao.org>
+ * Copyright 2011-2013 Kubo Takehiro <kubo@jiubao.org>
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -109,10 +109,11 @@ typedef struct {
   int (*uncompress)(FILE *infp, FILE *outfp, int skip_magic);
 } stream_format_t;
 
-#define FILE_HEADER_LENGTH_MAX 9  /* snappy framed format */
+#define FILE_HEADER_LENGTH_MAX 10  /* snappy framed format2 */
 
 extern stream_format_t snzip_format;
 extern stream_format_t snappy_framed_format;
+extern stream_format_t snappy_framed2_format;
 extern stream_format_t snappy_java_format;
 extern stream_format_t snappy_in_java_format;
 extern stream_format_t comment_43_format;

@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil -*-
  *
- * Copyright 2011-2012 Kubo Takehiro <kubo@jiubao.org>
+ * Copyright 2011-2013 Kubo Takehiro <kubo@jiubao.org>
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -77,6 +77,7 @@ static void show_usage(const char *progname, int exit_code);
 static stream_format_t *stream_formats[] = {
   &snzip_format,
   &snappy_framed_format,
+  &snappy_framed2_format,
   &snappy_java_format,
   &snappy_in_java_format,
   &comment_43_format,

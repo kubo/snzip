@@ -42,10 +42,10 @@
 #define UNCOMPRESSED_DATA_IDENTIFIER 0x01
 
 /* 4.1. Stream identifier (0xff) */
-static const char stream_header[9] = {0xff, 0x06, 0x00, 0x73, 0x4e, 0x61, 0x50, 0x70, 0x59};
+static const char stream_header[10] = {0xff, 0x06, 0x00, 0x00, 0x73, 0x4e, 0x61, 0x50, 0x70, 0x59};
 
-#define MAX_DATA_LEN 65535 /* maximum chunk data length */
-#define MAX_UNCOMPRESSED_DATA_LEN 32768 /* maximum uncompressed data length excluding checksum */
+#define MAX_DATA_LEN 16777215 /* maximum chunk data length */
+#define MAX_UNCOMPRESSED_DATA_LEN 65536 /* maximum uncompressed data length excluding checksum */
 
 static int snappy_framed_format_compress(FILE *infp, FILE *outfp, size_t block_size)
 {
@@ -93,6 +93,7 @@ static int snappy_framed_format_compress(FILE *infp, FILE *outfp, size_t block_s
     /* write data length */
     putc_unlocked(((write_len + 4) >> 0), outfp);
     putc_unlocked(((write_len + 4) >> 8), outfp);
+    putc_unlocked(((write_len + 4) >> 16), outfp);
     /* write checksum */
     putc_unlocked((crc32c >>  0), outfp);
     putc_unlocked((crc32c >>  8), outfp);
@@ -188,6 +189,7 @@ static int snappy_framed_format_uncompress(FILE *infp, FILE *outfp, int skip_mag
     }
     data_len = getc_unlocked(infp);
     data_len |= getc_unlocked(infp) << 8;
+    data_len |= getc_unlocked(infp) << 16;
     if (data_len == (size_t)EOF) {
       print_error("Unexpected end of file\n");
       goto cleanup;
@@ -252,9 +254,9 @@ static int snappy_framed_format_uncompress(FILE *infp, FILE *outfp, int skip_mag
   return err;
 }
 
-stream_format_t snappy_framed_format = {
-  "snappy-framed",
-  "http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=55",
+stream_format_t snappy_framed2_format = {
+  "snappy-framed2",
+  "http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=71",
   "sz",
   stream_header,
   sizeof(stream_header),
