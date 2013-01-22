@@ -9,6 +9,7 @@ AM_INIT_AUTOMAKE
 AC_PROG_CC
 AC_GNU_SOURCE
 AC_C_BIGENDIAN
+AC_CANONICAL_HOST
 
 if test "$GCC"; then
    CFLAGS="$CFLAGS -Wall"
@@ -33,7 +34,10 @@ AC_ARG_WITH([snappy],
         [try this for a non-standard install prefix of the snappy library])],
     [
         CFLAGS="$CFLAGS -I$with_snappy/include"
-        LDFLAGS="$LDFLAGS -L$with_snappy/lib"
+        AS_CASE(["$host_os"],
+            [linux*],   [LDFLAGS="$LDFLAGS -L$with_snappy/lib -Wl,-rpath,$with_snappy/lib"],
+            [solaris*], [LDFLAGS="$LDFLAGS -L$with_snappy/lib -R$with_snappy/lib"],
+                        [LDFLAGS="$LDFLAGS -L$with_snappy/lib"])
     ],
     [])
 
