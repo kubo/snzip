@@ -43,8 +43,8 @@ run_test() {
 }
 
 run_test comment-43     snappy  alice29.txt house.jpg
-run_test snappy-framed  sz      alice29.txt house.jpg
-run_test snappy-framed2 sz      alice29.txt house.jpg
+run_test framing        sz      alice29.txt house.jpg
+run_test framing2       sz      alice29.txt house.jpg
 run_test snappy-in-java snappy  alice29.txt house.jpg
 run_test snappy-java    snappy  alice29.txt house.jpg
 run_test snzip          snz     alice29.txt house.jpg

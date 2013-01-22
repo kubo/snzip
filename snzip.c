@@ -76,8 +76,8 @@ static void show_usage(const char *progname, int exit_code);
 
 static stream_format_t *stream_formats[] = {
   &snzip_format,
-  &snappy_framed_format,
-  &snappy_framed2_format,
+  &framing_format,
+  &framing2_format,
   &snappy_java_format,
   &snappy_in_java_format,
   &comment_43_format,
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
     opt_keep = TRUE;
   }
   if (strstr(progname, "snappy") != NULL) {
-    fmt = &snappy_framed_format;
+    fmt = &framing2_format;
   }
 
   while ((opt = getopt(argc, argv, "cdkt:hb:B:R:W:T")) != -1) {

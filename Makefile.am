@@ -1,5 +1,5 @@
 # Command line tool.
-snzip_SOURCES = snzip.c snzip.h snzip-format.c snappy-framed-format.c snappy-framed2-format.c snappy-java-format.c snappy-in-java-format.c comment-43-format.c crc32.c crc32.h
+snzip_SOURCES = snzip.c snzip.h snzip-format.c framing-format.c framing2-format.c snappy-java-format.c snappy-in-java-format.c comment-43-format.c crc32.c crc32.h
 PROGS = snzip
 bin_PROGRAMS = $(PROGS)
 

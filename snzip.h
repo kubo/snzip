@@ -109,11 +109,11 @@ typedef struct {
   int (*uncompress)(FILE *infp, FILE *outfp, int skip_magic);
 } stream_format_t;
 
-#define FILE_HEADER_LENGTH_MAX 10  /* snappy framed format2 */
+#define FILE_HEADER_LENGTH_MAX 10  /* framing2 format */
 
 extern stream_format_t snzip_format;
-extern stream_format_t snappy_framed_format;
-extern stream_format_t snappy_framed2_format;
+extern stream_format_t framing_format;
+extern stream_format_t framing2_format;
 extern stream_format_t snappy_java_format;
 extern stream_format_t snappy_in_java_format;
 extern stream_format_t comment_43_format;

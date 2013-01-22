@@ -47,7 +47,7 @@ static const char stream_header[9] = {0xff, 0x06, 0x00, 0x73, 0x4e, 0x61, 0x50, 
 #define MAX_DATA_LEN 65535 /* maximum chunk data length */
 #define MAX_UNCOMPRESSED_DATA_LEN 32768 /* maximum uncompressed data length excluding checksum */
 
-static int snappy_framed_format_compress(FILE *infp, FILE *outfp, size_t block_size)
+static int framing_format_compress(FILE *infp, FILE *outfp, size_t block_size)
 {
   const size_t max_uncompressed_data_len = MAX_UNCOMPRESSED_DATA_LEN;
   const size_t max_compressed_data_len = snappy_max_compressed_length(max_uncompressed_data_len);
@@ -155,7 +155,7 @@ static int check_crc32c(const char *data, size_t datalen, const char *checksum)
   return 0;
 }
 
-static int snappy_framed_format_uncompress(FILE *infp, FILE *outfp, int skip_magic)
+static int framing_format_uncompress(FILE *infp, FILE *outfp, int skip_magic)
 {
   const size_t max_data_len = MAX_DATA_LEN;
   const size_t max_uncompressed_data_len = MAX_UNCOMPRESSED_DATA_LEN;
@@ -252,12 +252,12 @@ static int snappy_framed_format_uncompress(FILE *infp, FILE *outfp, int skip_mag
   return err;
 }
 
-stream_format_t snappy_framed_format = {
-  "snappy-framed",
+stream_format_t framing_format = {
+  "framing",
   "http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=55",
   "sz",
   stream_header,
   sizeof(stream_header),
-  snappy_framed_format_compress,
-  snappy_framed_format_uncompress,
+  framing_format_compress,
+  framing_format_uncompress,
 };
