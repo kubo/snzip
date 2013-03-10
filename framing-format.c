@@ -256,8 +256,6 @@ stream_format_t framing_format = {
   "framing",
   "http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=55",
   "sz",
-  stream_header,
-  sizeof(stream_header),
   framing_format_compress,
   framing_format_uncompress,
 };

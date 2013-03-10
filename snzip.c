@@ -108,32 +108,44 @@ static stream_format_t *find_stream_format_by_suffix(const char *suffix)
 
 static stream_format_t *find_stream_format_by_file_header(FILE *fp)
 {
-  char buf[FILE_HEADER_LENGTH_MAX];
-  int len = 0, idx;
-
-  while (len < FILE_HEADER_LENGTH_MAX) {
-    int c = getc_unlocked(fp);
-    if (c == -1) {
-      fprintf(stderr, "Unexpected EOF\n");
-      return NULL;
-    }
-    buf[len++] = c;
-    for (idx = 0; idx < NUM_OF_STREAM_FORMATS; idx++) {
-      stream_format_t *fmt = stream_formats[idx];
-      if (fmt->file_header_length == len) {
-        trace("compare magic with %s.\n", fmt->name);
-        if (memcmp(fmt->file_header, buf, len) == 0) {
-          trace("%s is found.\n", fmt->name);
-          return fmt;
-        }
+  /*  framing        {0xff, 0x06, 0x00, 's',  'N',  'a',  'P',  'p',  'Y'}
+   *  framing2       {0xff, 0x06, 0x00, 0x00, 's',  'N',  'a',  'P',  'p',  'Y'}
+   *  snzip          {'S',  'N',  'Z'}
+   *  snappy-java    {0x82, 'S',  'N',  'A',  'P',  'P',  'Y',  0x00}
+   *  snappy-in-java {'s',  'n',  'a',  'p',  'p',  'y',  0x00}
+   */
+#define CHK(chr) if (getc_unlocked(fp) != (chr)) goto error
+  switch (getc_unlocked(fp)) {
+  case 0xff:
+    CHK(0x06); CHK(0x00);
+    switch (getc_unlocked(fp)) {
+    case 's':
+      switch (getc_unlocked(fp)) {
+      case 'N':
+        CHK('a'); CHK('P'); CHK('p'); CHK('Y');
+        return &framing_format;
+      case 'n':
+        CHK('a'); CHK('p'); CHK('p'); CHK('y');
+        return &comment_43_format;
       }
+      break;
+    case 0x00:
+      CHK('s');  CHK('N'); CHK('a'); CHK('P'); CHK('p'); CHK('Y');
+      return &framing2_format;
     }
+    break;
+  case 'S':
+    CHK('N'); CHK('Z');
+    return &snzip_format;
+  case 0x82:
+    CHK('S'); CHK('N'); CHK('A'); CHK('P'); CHK('P'); CHK('Y'); CHK(0x00);
+    return &snappy_java_format;
+  case 's':
+    CHK('n'); CHK('a'); CHK('p'); CHK('p'); CHK('y'); CHK(0x00);
+    return &snappy_in_java_format;
   }
-  fprintf(stderr, "Unknown file header:");
-  for (idx = 0; idx < len; idx++) {
-    fprintf(stderr, " 0x%02x", (unsigned char)buf[idx]);
-  }
-  putc('\n', stderr);
+ error:
+  fprintf(stderr, "Unknown file header\n");
   return NULL;
 }
 

@@ -231,8 +231,6 @@ stream_format_t snappy_java_format = {
   "snappy-java",
   "http://code.google.com/p/snappy-java/",
   "snappy",
-  SNAPPY_JAVA_MAGIC,
-  SNAPPY_JAVA_MAGIC_LEN,
   snappy_java_compress,
   snappy_java_uncompress,
 };

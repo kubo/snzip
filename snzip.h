@@ -103,13 +103,9 @@ typedef struct {
   const char *name;
   const char *url;
   const char *suffix;
-  const char *file_header; /* magic field only */
-  size_t file_header_length;
   int (*compress)(FILE *infp, FILE *outfp, size_t block_size);
   int (*uncompress)(FILE *infp, FILE *outfp, int skip_magic);
 } stream_format_t;
-
-#define FILE_HEADER_LENGTH_MAX 10  /* framing2 format */
 
 extern stream_format_t snzip_format;
 extern stream_format_t framing_format;

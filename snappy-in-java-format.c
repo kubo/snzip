@@ -280,8 +280,6 @@ stream_format_t snappy_in_java_format = {
   "snappy-in-java",
   "https://github.com/dain/snappy",
   "snappy",
-  SNAPPY_IN_JAVA_MAGIC,
-  SNAPPY_IN_JAVA_MAGIC_LEN,
   snappy_in_java_compress,
   snappy_in_java_uncompress,
 };

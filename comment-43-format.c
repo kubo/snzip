@@ -314,8 +314,6 @@ stream_format_t comment_43_format = {
   "comment-43",
   "http://code.google.com/p/snappy/issues/detail?id=34#c43",
   "snappy",
-  "\xff\x06\x00" MAGIC,
-  3 + MAGIC_LEN,
   comment_43_compress,
   comment_43_uncompress,
 };
