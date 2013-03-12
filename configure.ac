@@ -5,6 +5,23 @@ AC_INIT([snzip], [0.9.0])
 
 AM_INIT_AUTOMAKE
 
+AC_ARG_WITH([default-format],
+    [AS_HELP_STRING([--with-default-format=snzip|framing|framing2],
+        [Set default format @<:@default=framing2@:>@])],
+    [
+        AS_CASE(["$with_default_format"],
+            [snzip],          [],
+            [framing],        [],
+            [framing2],       [],
+            [snappy-java],    [with_default_format=snappy_java],
+            [snappy-in-java], [with_default_format=snappy_in_java],
+            [AC_MSG_ERROR([Unknown --with-default-format argument: $with_default_format.
+   It should be snzip, framing or framing2.
+   ])])
+    ],
+    [with_default_format=framing2])
+AC_DEFINE_UNQUOTED([DEFAULT_FORMAT], [${with_default_format}_format], [Default format for compression])
+
 # These are flags passed to automake (though they look like gcc flags!)
 AC_PROG_CC
 AC_GNU_SOURCE

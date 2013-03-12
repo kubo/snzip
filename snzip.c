@@ -75,9 +75,9 @@ static void copy_file_attributes(int infd, int outfd, const char *outfile);
 static void show_usage(const char *progname, int exit_code);
 
 static stream_format_t *stream_formats[] = {
-  &snzip_format,
-  &framing_format,
   &framing2_format,
+  &framing_format,
+  &snzip_format,
   &snappy_java_format,
   &snappy_in_java_format,
   &comment_43_format,
@@ -187,7 +187,7 @@ int main(int argc, char **argv)
   size_t rsize = 0;
   size_t wsize = 0;
   const char *format_name = NULL;
-  stream_format_t *fmt = &snzip_format;
+  stream_format_t *fmt = &DEFAULT_FORMAT;
 
   char *progname = strrchr(argv[0], PATH_DELIMITER);
   if (progname != NULL) {
@@ -475,13 +475,13 @@ static void show_usage(const char *progname, int exit_code)
   fprintf(stderr,
           PACKAGE_STRING "\n"
           "\n"
-          "  usage: %s [option ...] [file ...]\n"
+          "  Usage: %s [option ...] [file ...]\n"
           "\n"
           "  general options:\n"
           "   -c       output to standard output, keep original files unchanged\n"
           "   -d       decompress\n"
           "   -k       keep (don't delete) input files\n"
-          "   -t name  file format name. see below.\n"
+          "   -t name  file format name. see below. The default format is %s.\n"
           "   -h       give this help\n"
           "\n"
           "  tuning options:\n"
@@ -492,7 +492,7 @@ static void show_usage(const char *progname, int exit_code)
           "   -T       trace for debug\n"
           "\n"
           "  supported formats:\n",
-          progname);
+          progname, DEFAULT_FORMAT.name);
 
   max_name_len = strlen("name");
   max_suffix_len = strlen("suffix");
