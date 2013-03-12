@@ -17,7 +17,7 @@ to snappy, unsnappy or so.
 Installation
 ------------
 
-Download snzip-0.9.0.tar.gz from https://github.com/kubo/snzip,
+Download snzip-0.9.0.tar.gz from https://github.com/kubo/snzip/downloads,
 uncompress and untar it, and run configure.
 
     tar xvfz snzip-0.9.0.tar.gz
