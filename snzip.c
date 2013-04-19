@@ -265,12 +265,6 @@ int main(int argc, char **argv)
 
   if (optind == argc) {
     trace("no arguments are set.\n");
-    if (isatty(1)) {
-      /* stdout is a terminal */
-      fprintf(stderr, "I won't write compressed data to a terminal.\n");
-      fprintf(stderr, "For help, type: '%s -h'.\n", progname);
-      return 1;
-    }
 
     if (opt_uncompress) {
       int skip_magic = 0;
@@ -283,6 +277,12 @@ int main(int argc, char **argv)
       }
       return fmt->uncompress(stdin, stdout, skip_magic);
     } else {
+      if (isatty(1)) {
+        /* stdout is a terminal */
+        fprintf(stderr, "I won't write compressed data to a terminal.\n");
+        fprintf(stderr, "For help, type: '%s -h'.\n", progname);
+        return 1;
+      }
       return fmt->compress(stdin, stdout, block_size);
     }
   }
