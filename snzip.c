@@ -207,9 +207,6 @@ int main(int argc, char **argv)
     opt_uncompress = TRUE;
     opt_keep = TRUE;
   }
-  if (strstr(progname, "snappy") != NULL) {
-    fmt = &framing2_format;
-  }
 
   while ((opt = getopt(argc, argv, "cdkt:hb:B:R:W:T")) != -1) {
     switch (opt) {
