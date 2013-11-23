@@ -5,40 +5,47 @@ What is snzip.
 --------------
 
 Snzip is one of command line tools using [snappy][].
-This supports four type of file formats; snzip format,
-[framing-format][] [snappy-java][] format and [snappy-in-java][]
-format. The default format is snzip.
+This supports five types of file formats; snzip format,
+[framing-format][], [old framing-format][], [snappy-java][]
+format and [snappy-in-java][] format.
+The default format is [framing-format][].
 
-Note that the default format is changed to [framing-format][] when
-the program name includes "snappy." If you want to use snzip
-as a [framing-format][] compressor/decompressor, rename snzip
-to snappy, unsnappy or so.
+Notable Changes
+---------------
+
+The default format was changed to [framing-format][] in 1.0.0.
+Set --with-default-format=snzip as a configure option to use snzip
+format as the default format as before.
 
 Installation
 ------------
 
-Download snzip-0.9.0.tar.gz from https://github.com/kubo/snzip/downloads,
+Download snzip-1.0.0.tar.gz from http://www.jiubao.org/snzip/,
 uncompress and untar it, and run configure.
 
-    tar xvfz snzip-0.9.0.tar.gz
-    cd snzip-0.9.0
+    tar xvfz snzip-1.0.0.tar.gz
+    cd snzip-1.0.0
     ./configure
 
 If you didn't install snappy under /usr or /usr/local, you need to specify
 the location by '--with-snappy' as follows.
 
     # install snappy
-    tar xvfz snappy-1.0.4.tar.gz
-    cd snappy-1.0.4
+    tar xvfz snappy-1.1.0.tar.gz
+    cd snappy-1.1.0
     ./configure --prefix=/usr/local/snappy
     make
     make install
     cd ..
     
     # install snzip
-    tar xvfz snzip-0.9.0.tar.gz
-    cd snzip-0.9.0
+    tar xvfz snzip-1.0.0.tar.gz
+    cd snzip-1.0.0
     ./configure --with-snappy=/usr/local/snappy
+
+You can use --with-default-format to change the default compression format.
+
+    ./configure --with-default-format=snzip
 
 To use source code in the github repository.
 
@@ -54,10 +61,10 @@ Usage
 
     snzip file.tar
 
-Compressed file name is 'file.tar.snz' and the original file is deleted.
+Compressed file name is 'file.tar.sz' and the original file is deleted.
 Timestamp, mode and permissions are not changed as possible as it can.
 
-The file format is SNZ. You need to add an option '-t snappy-java' or
+The file format is [framing-format][]. You need to add an option '-t snappy-java' or
 '-t snappy-in-java' to use other formats.
 
     snzip -t snappy-java file.tar
@@ -68,36 +75,36 @@ or
 
 ### To compress file.tar and output to standard out.
 
-    snzip -c file.tar > file.tar.snz
+    snzip -c file.tar > file.tar.sz
 
 or
 
-    cat file.tar | snzip > file.tar.snz
+    cat file.tar | snzip > file.tar.sz
 
-You need to add an option '-t [format-name]' to use formats except SNZ.
+You need to add an option '-t [format-name]' to use formats except [framing-format][].
 
 
-### To uncompress file.tar.snz:
+### To uncompress file.tar.sz:
 
-    snzip -d file.tar.snz
+    snzip -d file.tar.sz
 
 or
 
-    snunzip file.tar.snz
+    snunzip file.tar.sz
 
 Uncompressed file name is 'file.tar' and the original file is deleted.
 Timestamp, mode and permissions are not changed as possible as it can.
 
 If the program name includes 'un' such as snunzip, it acts as '-d' is set.
 
-The file format is automatically determined from the first byte of the file.
+The file format is automatically determined from the file header.
 
-### To uncompress file.tar.snz and output to standard out.
+### To uncompress file.tar.sz and output to standard out.
 
-    snzip -dc file.tar.snz > file.tar
-    snunzip -c file.tar.snz > file.tar
-    snzcat file.tar.snz > file.tar
-    cat file.tar.snz | snzcat > file.tar
+    snzip -dc file.tar.sz > file.tar
+    snunzip -c file.tar.sz > file.tar
+    snzcat file.tar.sz > file.tar
+    cat file.tar.sz | snzcat > file.tar
 
 If the program name includes 'cat' such as snzcat, it acts as '-dc' is set.
 
@@ -129,7 +136,8 @@ License
 2-clause BSD-style license.
 
 [snappy]: http://code.google.com/p/snappy/
-[framing-format]: http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=55
+[framing-format]: http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=71
+[old framing-format]: http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=55
 [Issue 34: Command line tool]: http://code.google.com/p/snappy/issues/detail?id=34
 [snappy::Varint::Encode32()]: http://code.google.com/p/snappy/source/browse/trunk/snappy-stubs-internal.h?r=51#461
 [snappy-java]: http://code.google.com/p/snappy-java/
