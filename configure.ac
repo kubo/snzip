@@ -1,7 +1,7 @@
 # The autoconf version must be at least 2.64 to correctly detect
 # endianess of Mac OS X universal binary.
 AC_PREREQ(2.64)
-AC_INIT([snzip], [1.0.0])
+AC_INIT([snzip], [1.0.1])
 
 AM_INIT_AUTOMAKE
 

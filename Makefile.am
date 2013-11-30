@@ -3,8 +3,8 @@ snzip_SOURCES = snzip.c snzip.h snzip-format.c framing-format.c framing2-format.
 PROGS = snzip
 bin_PROGRAMS = $(PROGS)
 
-EXTRA_DIST = autogen.sh
-dist_doc_DATA = ChangeLog COPYING INSTALL NEWS README
+EXTRA_DIST = autogen.sh spec/snzip.spec
+dist_doc_DATA = AUTHORS ChangeLog COPYING INSTALL NEWS README.md
 
 dist-hook:
 	git log > $(distdir)/ChangeLog
