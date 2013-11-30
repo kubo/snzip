@@ -1,0 +1,41 @@
+Summary: A fast data comprssion utility using google snappy
+Name: snzip
+Version: @VERSION@
+Release: 1
+License: New BSD
+Group: System Environment
+Packager: Xianglei
+BuildRequires: make gcc snappy-devel
+Source: http://www.jiubao.org/snzip/snzip-@VERSION@.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Url: https://github.com/kubo/snzip
+
+%description
+Snzip is a compress/decompress command line utility using snappy.
+This supports five type of file formats; framing-format, old framing-format,
+snzip format, snappy-java format and snappy-in-java format.
+The default format is framing-format.
+
+%prep
+%setup -q
+
+%build
+%configure --prefix=/usr
+%{__make} %{?_smp_mflags}
+
+%install
+%{__rm} -rf %{buildroot}
+make install DESTDIR=%{buildroot} INSTALLDIRS=vendor
+
+%clean
+rm -rf %{buildroot}
+
+%files
+%defattr(-, root, root, 0755)
+/usr/bin/snzip
+/usr/share/doc/snzip/AUTHORS
+/usr/share/doc/snzip/COPYING
+/usr/share/doc/snzip/ChangeLog
+/usr/share/doc/snzip/INSTALL
+/usr/share/doc/snzip/NEWS
+/usr/share/doc/snzip/README.md

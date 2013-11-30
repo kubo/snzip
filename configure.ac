@@ -62,5 +62,5 @@ AC_CHECK_LIB([snappy], [snappy_compress], [],
 [AC_MSG_ERROR([No snappy library is not found.])])
 
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile spec/snzip.spec])
 AC_OUTPUT
