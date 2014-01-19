@@ -22,7 +22,7 @@ Installation
 
 ### Install a tar-ball
 
-Download snzip-1.0.1.tar.gz from http://www.jiubao.org/snzip/,
+Download snzip-1.0.1.tar.gz from https://bintray.com/kubo/generic/snzip,
 uncompress and untar it, and run configure.
 
     tar xvfz snzip-1.0.1.tar.gz
@@ -52,7 +52,7 @@ You can use --with-default-format to change the default compression format.
 ### Install a rpm package
 
 We don't provide rpm packages. You need to download snzip-1.0.1.tar.gz
-from http://www.jiubao.org/snzip/, create a rpm package as follows and
+from https://bintray.com/kubo/generic/snzip, create a rpm package as follows and
 install it.
 
     # The rpm package will be created under $HOME/rpmbuild/RPMS.
