@@ -5,8 +5,8 @@ What is snzip.
 --------------
 
 Snzip is one of command line tools using [snappy][].
-This supports five types of file formats; snzip format,
-[framing-format][], [old framing-format][], [snappy-java][]
+This supports five types of file formats; [framing-format][],
+[old framing-format][], SNZ format, [snappy-java][]
 format and [snappy-in-java][] format.
 The default format is [framing-format][].
 
@@ -131,6 +131,8 @@ If the program name includes 'cat' such as snzcat, it acts as '-dc' is set.
 SNZ File format
 ---------------
 
+Note: This is obsolete format. The default format was changed to [framing-format].
+
 The first three bytes are magic characters 'SNZ'.
 
 The fourth byte is the file format version. It is 0x01.
@@ -156,7 +158,7 @@ License
 2-clause BSD-style license.
 
 [snappy]: http://code.google.com/p/snappy/
-[framing-format]: http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=71
+[framing-format]: http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=82
 [old framing-format]: http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=55
 [Issue 34: Command line tool]: http://code.google.com/p/snappy/issues/detail?id=34
 [snappy::Varint::Encode32()]: http://code.google.com/p/snappy/source/browse/trunk/snappy-stubs-internal.h?r=51#461
