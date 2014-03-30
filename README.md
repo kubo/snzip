@@ -96,6 +96,9 @@ or
 
 You need to add an option '-t [format-name]' to use formats except [framing-format][].
 
+### To create a new tar file and compress it.
+
+    tar cf - files-to-be-archived | snzip > archive.tar.sz
 
 ### To uncompress file.tar.sz:
 
@@ -120,6 +123,10 @@ The file format is automatically determined from the file header.
     cat file.tar.sz | snzcat > file.tar
 
 If the program name includes 'cat' such as snzcat, it acts as '-dc' is set.
+
+### To uncompress a tar file and extract it.
+
+    snzip -dc archive.tar.sz | tar xf -
 
 SNZ File format
 ---------------
