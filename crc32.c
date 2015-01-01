@@ -843,26 +843,26 @@ sse4_2_crc32c(uint32_t crc32c,
 #if defined(__x86_64) || defined(__x86_64__) || defined(_M_X64)
 	quotient = length / 8;
 	while (quotient--) {
-		crc32c = _mm_crc32_u64(crc32c, *(size_t*)buffer);
+		crc32c = _mm_crc32_u64(crc32c, *(uint64_t*)buffer);
 		buffer += 8;
 	}
 	if (length & 4) {
-		crc32c = _mm_crc32_u32(crc32c, *(unsigned int*)buffer);
+		crc32c = _mm_crc32_u32(crc32c, *(uint32_t*)buffer);
 		buffer += 4;
 	}
 #else
 	quotient = length / 4;
 	while (quotient--) {
-		crc32c = _mm_crc32_u32(crc32c, *(size_t*)buffer);
+		crc32c = _mm_crc32_u32(crc32c, *(uint32_t*)buffer);
 		buffer += 4;
 	}
 #endif
 	if (length & 2) {
-		crc32c = _mm_crc32_u16(crc32c, *(unsigned short*)buffer);
+		crc32c = _mm_crc32_u16(crc32c, *(uint16_t*)buffer);
 		buffer += 2;
 	}
 	if (length & 1) {
-		crc32c = _mm_crc32_u8(crc32c, *(unsigned char*)buffer);
+		crc32c = _mm_crc32_u8(crc32c, *(uint8_t*)buffer);
 	}
 	return crc32c;
 }
