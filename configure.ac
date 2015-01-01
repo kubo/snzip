@@ -45,6 +45,19 @@ AC_CHECK_MEMBERS([struct stat.st_mtimensec, struct stat.st_mtim.tv_nsec, struct 
 # unlocked stdio functions
 AC_CHECK_FUNCS(getc_unlocked putc_unlocked fread_unlocked fwrite_unlocked ferror_unlocked feof_unlocked)
 
+# Check SSE4.2
+AC_MSG_CHECKING(whether -msse4.2 is accepted as CFLAGS)
+saved_CFLAGS="$CFLAGS"
+CPPFLAGS="$CFLAGS -msse4.2"
+AC_TRY_COMPILE([], [],
+    [AC_MSG_RESULT(yes)],
+    [AC_MSG_RESULT(no); CFLAGS="$saved_CFLAGS"])
+
+AC_CHECK_DECLS([_mm_crc32_u32], [], [], [#include <nmmintrin.h>])
+
+AS_IF([test "x$ac_cv_have_decl__mm_crc32_u32" = xyes],
+    [AC_DEFINE([HAVE_SSE4_2], 1, [Define to 1 if you have SSE4.2])])
+
 # introduce the optional configure parameter for a non-standard install prefix of snappy
 AC_ARG_WITH([snappy],
     [AS_HELP_STRING([--with-snappy=prefix],

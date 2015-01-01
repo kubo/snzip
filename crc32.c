@@ -743,11 +743,159 @@ multitable_crc32c(uint32_t crc32c,
 	return (crc32c_sb8_64_bit(crc32c, buffer, length, to_even_word));
 }
 
+#ifdef HAVE_SSE4_2
+/*
+ * Use SSE4.2 to calculate crc32c.
+ *
+ * Copyright 2015 Kubo Takehiro <kubo@jiubao.org>
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are
+ * permitted provided that the following conditions are met:
+ *
+ *    1. Redistributions of source code must retain the above copyright notice, this list of
+ *       conditions and the following disclaimer.
+ *
+ *    2. Redistributions in binary form must reproduce the above copyright notice, this list
+ *       of conditions and the following disclaimer in the documentation and/or other materials
+ *       provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ''AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and should not be interpreted as representing official policies, either expressed
+ * or implied, of the authors.
+ */
+#include <nmmintrin.h>
+
+#if defined _MSC_VER && _MSC_VER >= 1400
+#include <intrin.h>
+#endif
+#if defined __GNUC__ && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))
+#include <cpuid.h>
+#endif
+
+#define CPUID_ECX_BIT_SSE4_2 (1u << 20)
+
+static int sse4_2_is_available(void)
+{
+#if defined __GNUC__ /* GNU C Compiler */
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
+	/* gcc version >= 4.3 */
+	unsigned int eax_, ebx_, ecx_, edx_;
+	__cpuid(1, eax_, ebx_, ecx_, edx_);
+#else
+	/* gcc version < 4.3 */
+	unsigned int ecx_;
+#if defined(__i386__) && defined(__PIC__)
+	__asm(
+		"movl $1, %%eax;"
+		"pushl %%ebx;"
+		"cpuid;"
+		"popl %%ebx;"
+		: "=c" (ecx_)
+		:
+		: "eax", "edx");
+#else
+	__asm(
+		"movl $1, %%eax;"
+		"cpuid;"
+		: "=c" (ecx_)
+		:
+		: "eax", "ebx", "edx");
+#endif
+#endif
+#elif defined _MSC_VER /* Microsoft Visual C++ */
+#if _MSC_VER >= 1400
+	/* msvc version >= 2005 */
+	int cpuinfo[4], ecx_;
+	__cpuid(cpuinfo, 1);
+	ecx_ = cpuinfo[2];
+#else
+	/* msvc version < 2005 */
+	unsigned int ecx_;
+	__asm {
+		mov eax, 1
+		cpuid
+		mov ecx_, ecx
+	}
+#endif
+#else /* Other compilers */
+#error unsupported compiler
+#endif
+	return (ecx_ & CPUID_ECX_BIT_SSE4_2) ? 1 : 0;
+}
+
+static uint32_t
+sse4_2_crc32c(uint32_t crc32c,
+    const unsigned char *buffer,
+    unsigned int length)
+{
+	size_t quotient;
+ 
+#if defined(__x86_64) || defined(__x86_64__) || defined(_M_X64)
+	quotient = length / 8;
+	while (quotient--) {
+		crc32c = _mm_crc32_u64(crc32c, *(size_t*)buffer);
+		buffer += 8;
+	}
+	if (length & 4) {
+		crc32c = _mm_crc32_u32(crc32c, *(unsigned int*)buffer);
+		buffer += 4;
+	}
+#else
+	quotient = length / 4;
+	while (quotient--) {
+		crc32c = _mm_crc32_u32(crc32c, *(size_t*)buffer);
+		buffer += 4;
+	}
+#endif
+	if (length & 2) {
+		crc32c = _mm_crc32_u16(crc32c, *(unsigned short*)buffer);
+		buffer += 2;
+	}
+	if (length & 1) {
+		crc32c = _mm_crc32_u8(crc32c, *(unsigned char*)buffer);
+	}
+	return crc32c;
+}
+
+static uint32_t select_crc32c_func(uint32_t crc32c, const unsigned char *buffer,unsigned int length);
+
+static uint32_t (*crc32c_func)(uint32_t, const unsigned char *, unsigned int) = select_crc32c_func;
+
+/* This function is called only once. */
+static uint32_t
+select_crc32c_func(uint32_t crc32c,
+    const unsigned char *buffer,
+    unsigned int length)
+{
+	if (sse4_2_is_available()) {
+		crc32c_func = sse4_2_crc32c;
+	} else {
+		crc32c_func = NULL;
+	}
+	return calculate_crc32c(crc32c, buffer, length);
+}
+#endif
+
 uint32_t
 calculate_crc32c(uint32_t crc32c,
     const unsigned char *buffer,
     unsigned int length)
 {
+#ifdef HAVE_SSE4_2
+	if (crc32c_func) {
+		return crc32c_func(crc32c, buffer, length);
+	}
+#endif
 	if (length < 4) {
 		return (singletable_crc32c(crc32c, buffer, length));
 	} else {
