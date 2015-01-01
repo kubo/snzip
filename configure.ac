@@ -59,7 +59,7 @@ AC_ARG_WITH([snappy],
     [])
 
 AC_CHECK_LIB([snappy], [snappy_compress], [],
-[AC_MSG_ERROR([No snappy library is not found.])])
+[AC_MSG_ERROR([Snappy library is not found.])])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile spec/snzip.spec])

@@ -150,7 +150,7 @@ static stream_format_t *find_stream_format_by_file_header(FILE *fp)
 }
 
 int trc_lineno;
-const const char *trc_filename = __FILE__;
+const char *trc_filename = __FILE__;
 
 void print_error_(const char *fmt, ...)
 {
