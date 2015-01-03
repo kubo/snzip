@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil -*-
  *
- * Copyright 2011-2012 Kubo Takehiro <kubo@jiubao.org>
+ * Copyright 2011-2015 Kubo Takehiro <kubo@jiubao.org>
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -35,7 +35,11 @@
 #include <string.h>
 #include <errno.h>
 #include <snappy-c.h>
+#ifdef WIN32
+#include <winsock2.h>
+#else
 #include <arpa/inet.h>
+#endif
 #include "snzip.h"
 
 #define SNAPPY_JAVA_MAGIC "\x82SNAPPY\x00"

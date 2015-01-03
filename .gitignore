@@ -5,8 +5,9 @@ Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
+compile
 config.guess
-config.h
+./config.h
 config.h.in
 config.log
 config.status
@@ -17,3 +18,12 @@ install-sh
 missing
 snzip
 stamp-h1
+win32/Debug
+win32/Release
+win32/snappy
+win32/snzip.sdf
+win32/snzip*.suo
+win32/snzip.vcxproj.filters
+win32/snzip.vcxproj.user
+win32/x64
+
