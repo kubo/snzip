@@ -773,8 +773,6 @@ multitable_crc32c(uint32_t crc32c,
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of the authors.
  */
-#include <nmmintrin.h>
-
 #if defined _MSC_VER && _MSC_VER >= 1400
 #include <intrin.h>
 #endif
@@ -833,40 +831,6 @@ static int sse4_2_is_available(void)
 	return (ecx_ & CPUID_ECX_BIT_SSE4_2) ? 1 : 0;
 }
 
-static uint32_t
-sse4_2_crc32c(uint32_t crc32c,
-    const unsigned char *buffer,
-    unsigned int length)
-{
-	size_t quotient;
- 
-#if defined(__x86_64) || defined(__x86_64__) || defined(_M_X64)
-	quotient = length / 8;
-	while (quotient--) {
-		crc32c = _mm_crc32_u64(crc32c, *(uint64_t*)buffer);
-		buffer += 8;
-	}
-	if (length & 4) {
-		crc32c = _mm_crc32_u32(crc32c, *(uint32_t*)buffer);
-		buffer += 4;
-	}
-#else
-	quotient = length / 4;
-	while (quotient--) {
-		crc32c = _mm_crc32_u32(crc32c, *(uint32_t*)buffer);
-		buffer += 4;
-	}
-#endif
-	if (length & 2) {
-		crc32c = _mm_crc32_u16(crc32c, *(uint16_t*)buffer);
-		buffer += 2;
-	}
-	if (length & 1) {
-		crc32c = _mm_crc32_u8(crc32c, *(uint8_t*)buffer);
-	}
-	return crc32c;
-}
-
 static uint32_t select_crc32c_func(uint32_t crc32c, const unsigned char *buffer,unsigned int length);
 
 static uint32_t (*crc32c_func)(uint32_t, const unsigned char *, unsigned int) = select_crc32c_func;
@@ -878,7 +842,7 @@ select_crc32c_func(uint32_t crc32c,
     unsigned int length)
 {
 	if (sse4_2_is_available()) {
-		crc32c_func = sse4_2_crc32c;
+		crc32c_func = calculate_crc32c_sse4_2;
 	} else {
 		crc32c_func = NULL;
 	}

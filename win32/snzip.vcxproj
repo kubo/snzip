@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="..\comment-43-format.c" />
     <ClCompile Include="..\crc32.c" />
+    <ClCompile Include="..\crc32_sse4_2.c" />
     <ClCompile Include="..\framing-format.c" />
     <ClCompile Include="..\framing2-format.c" />
     <ClCompile Include="..\snappy-in-java-format.c" />

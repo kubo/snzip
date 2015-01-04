@@ -7,6 +7,9 @@
 uint32_t calculate_crc32c(uint32_t crc32c, const unsigned char *buffer,
 			  unsigned int length);
 
+uint32_t calculate_crc32c_sse4_2(uint32_t crc32c, const unsigned char *buffer,
+			  unsigned int length);
+
 static inline unsigned int masked_crc32c(const char *buf, size_t len)
 {
   unsigned int crc = ~calculate_crc32c(~0, (const unsigned char *)buf, len);
