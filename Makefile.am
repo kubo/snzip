@@ -8,7 +8,7 @@ CFLAGS_SSE4_2 = @CFLAGS_SSE4_2@
 PROGS = snzip
 bin_PROGRAMS = $(PROGS)
 
-EXTRA_DIST = autogen.sh spec/snzip.spec
+EXTRA_DIST = spec/snzip.spec win32/config.h win32/snzip.sln win32/snzip.vcxproj win32/ya_getopt.c win32/ya_getopt.h
 dist_doc_DATA = AUTHORS ChangeLog COPYING INSTALL NEWS README.md
 
 dist-hook:

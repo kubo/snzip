@@ -28,6 +28,7 @@
  * or implied, of the authors.
  */
 #include <stdlib.h>
+#include "config.h"
 #include "crc32.h"
 #include <nmmintrin.h>
 

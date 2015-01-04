@@ -1,3 +1,8 @@
+snzip 1.0.2 - 2015-01-04
+
+* Use SSE4.2 to calculate CRC32C if it is available.
+* Add a getopt function and a Visual Studio 2013 project file for Windows.
+
 snzip 1.0.1 - 2013-11-30
 
 * Add a rpm spec file.

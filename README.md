@@ -20,45 +20,45 @@ format as the default format as before.
 Installation
 ------------
 
-### Install a tar-ball
+### Install from a tar-ball
 
-Download snzip-1.0.1.tar.gz from https://bintray.com/kubo/generic/snzip,
+Download snzip-1.0.2.tar.gz from https://bintray.com/kubo/generic/snzip,
 uncompress and untar it, and run configure.
 
-    tar xvfz snzip-1.0.1.tar.gz
-    cd snzip-1.0.1
+    tar xvfz snzip-1.0.2.tar.gz
+    cd snzip-1.0.2
     ./configure
 
 If you didn't install snappy under /usr or /usr/local, you need to specify
 the location by '--with-snappy' as follows.
 
     # install snappy
-    tar xvfz snappy-1.1.1.tar.gz
-    cd snappy-1.1.1
+    tar xvfz snappy-1.1.2.tar.gz
+    cd snappy-1.1.2
     ./configure --prefix=/usr/local/snappy
     make
     make install
     cd ..
     
     # install snzip
-    tar xvfz snzip-1.0.1.tar.gz
-    cd snzip-1.0.1
+    tar xvfz snzip-1.0.2.tar.gz
+    cd snzip-1.0.2
     ./configure --with-snappy=/usr/local/snappy
 
 You can use --with-default-format to change the default compression format.
 
     ./configure --with-default-format=snzip
 
-### Install a rpm package
+### Install as a rpm package
 
-We don't provide rpm packages. You need to download snzip-1.0.1.tar.gz
+We don't provide rpm packages. You need to download snzip-1.0.2.tar.gz
 from https://bintray.com/kubo/generic/snzip, create a rpm package as follows and
 install it.
 
     # The rpm package will be created under $HOME/rpmbuild/RPMS.
-    rpmbuild -tb snzip-1.0.1.tar.gz 
+    rpmbuild -tb snzip-1.0.2.tar.gz 
 
-### Install latest source
+### Install from the latest source
 
 To use source code in the github repository.
 
@@ -66,6 +66,12 @@ To use source code in the github repository.
     cd snzip
     ./autogen.sh
     ./configure
+
+### Install a Windows package.
+
+Download `snzip-1.0.2-win32.zip` or `snzip-1.0.2-win64.zip` from
+https://bintray.com/kubo/generic/snzip and copy `snzip.exe` and `snunzip.exe`
+to a directory in the PATH environment variable.
 
 Usage
 -----
