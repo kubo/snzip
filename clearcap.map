@@ -1,0 +1,2 @@
+# This is used only for Solaris Studio to clear hardware capability flags.
+hwcap_1 = V0x0 OVERRIDE;

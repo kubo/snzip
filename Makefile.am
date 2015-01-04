@@ -3,6 +3,7 @@ snzip_SOURCES = snzip.c snzip.h snzip-format.c framing-format.c framing2-format.
 if HAVE_SSE4_2
 snzip_SOURCES += crc32_sse4_2.c
 endif
+snzip_LDFLAGS = @LDFLAGS_SSE4_2@
 CFLAGS_SSE4_2 = @CFLAGS_SSE4_2@
 PROGS = snzip
 bin_PROGRAMS = $(PROGS)

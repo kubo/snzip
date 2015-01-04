@@ -773,63 +773,85 @@ multitable_crc32c(uint32_t crc32c,
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of the authors.
  */
-#if defined _MSC_VER && _MSC_VER >= 1400
-#include <intrin.h>
-#endif
-#if defined __GNUC__ && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))
+#define CPUID_SSE4_2_IS_SET(x) (((x) & (1u << 20)) ? 1 : 0)
+
+#if defined __GNUC__
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
 #include <cpuid.h>
+#define USE_GCC_INTRINSIC 1 /* gcc 4.3 or later */
+#else
+#define USE_GCC_ASM 1
+#endif
 #endif
 
-#define CPUID_ECX_BIT_SSE4_2 (1u << 20)
+#if defined __SUNPRO_C && __SUNPRO_C >= 0x590
+#define USE_GCC_ASM 1 /* Sun Studio 12 or later */
+#endif
 
+#if defined _MSC_VER
+#if _MSC_VER >= 1400
+#include <intrin.h>
+#define USE_MSVC_INTRINSIC 1 /* Visual Studio 2005 or later */
+#else
+#define USE_MSVC_ASM 1
+#endif
+#endif
+
+#if defined USE_GCC_INTRINSIC
 static int sse4_2_is_available(void)
 {
-#if defined __GNUC__ /* GNU C Compiler */
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
-	/* gcc version >= 4.3 */
-	unsigned int eax_, ebx_, ecx_, edx_;
-	__cpuid(1, eax_, ebx_, ecx_, edx_);
-#else
-	/* gcc version < 4.3 */
-	unsigned int ecx_;
-#if defined(__i386__) && defined(__PIC__)
+	unsigned int eax, ebx, ecx, edx;
+	__cpuid(1, eax, ebx, ecx, edx);
+	return CPUID_SSE4_2_IS_SET(ecx);
+}
+
+#elif defined USE_GCC_ASM
+static int sse4_2_is_available(void)
+{
+	unsigned int ecx;
+#if (defined(__i386__) || defined(__i386)) && defined(__PIC__)
 	__asm(
 		"movl $1, %%eax;"
 		"pushl %%ebx;"
 		"cpuid;"
 		"popl %%ebx;"
-		: "=c" (ecx_)
+		: "=c" (ecx)
 		:
 		: "eax", "edx");
 #else
 	__asm(
 		"movl $1, %%eax;"
 		"cpuid;"
-		: "=c" (ecx_)
+		: "=c" (ecx)
 		:
 		: "eax", "ebx", "edx");
 #endif
-#endif
-#elif defined _MSC_VER /* Microsoft Visual C++ */
-#if _MSC_VER >= 1400
-	/* msvc version >= 2005 */
-	int cpuinfo[4], ecx_;
+	return CPUID_SSE4_2_IS_SET(ecx);
+}
+
+#elif defined USE_MSVC_INTRINSIC
+static int sse4_2_is_available(void)
+{
+	int cpuinfo[4];
 	__cpuid(cpuinfo, 1);
-	ecx_ = cpuinfo[2];
-#else
-	/* msvc version < 2005 */
-	unsigned int ecx_;
+	return CPUID_SSE4_2_IS_SET(cpuinfo[2]);
+}
+
+#elif defined USE_MSVC_ASM
+static int sse4_2_is_available(void)
+{
+	unsigned int rv;
 	__asm {
 		mov eax, 1
 		cpuid
-		mov ecx_, ecx
+		mov rv, ecx
 	}
-#endif
-#else /* Other compilers */
-#error unsupported compiler
-#endif
-	return (ecx_ & CPUID_ECX_BIT_SSE4_2) ? 1 : 0;
+	return CPUID_SSE4_2_IS_SET(rv);
 }
+
+#else
+#error unsupported compiler to use cpuid instruction. run 'configure' with --disable-sse4_2
+#endif
 
 static uint32_t select_crc32c_func(uint32_t crc32c, const unsigned char *buffer,unsigned int length);
 
