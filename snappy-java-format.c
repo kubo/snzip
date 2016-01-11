@@ -233,7 +233,7 @@ static int snappy_java_uncompress(FILE *infp, FILE *outfp, int skip_magic)
 
 stream_format_t snappy_java_format = {
   "snappy-java",
-  "http://code.google.com/p/snappy-java/",
+  "https://github.com/xerial/snappy-java",
   "snappy",
   snappy_java_compress,
   snappy_java_uncompress,

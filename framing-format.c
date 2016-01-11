@@ -254,7 +254,7 @@ static int framing_format_uncompress(FILE *infp, FILE *outfp, int skip_magic)
 
 stream_format_t framing_format = {
   "framing",
-  "http://code.google.com/p/snappy/source/browse/trunk/framing_format.txt?r=55",
+  "https://github.com/google/snappy/blob/0755c815197dacc77d8971ae917c86d7aa96bf8e/framing_format.txt",
   "sz",
   framing_format_compress,
   framing_format_uncompress,
