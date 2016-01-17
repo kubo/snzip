@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil -*-
  *
- * Copyright 2011-2013 Kubo Takehiro <kubo@jiubao.org>
+ * Copyright 2011-2016 Kubo Takehiro <kubo@jiubao.org>
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -30,6 +30,7 @@
 #ifndef SNZIP_H
 #define SNZIP_H 1
 #include <stdio.h>
+#include <stdint.h>
 
 #ifndef __GNUC__
 #define __attribute__(attr)
@@ -107,11 +108,14 @@ typedef struct {
   int (*uncompress)(FILE *infp, FILE *outfp, int skip_magic);
 } stream_format_t;
 
+extern int64_t uncompressed_source_len;
+
 extern stream_format_t snzip_format;
 extern stream_format_t framing_format;
 extern stream_format_t framing2_format;
 extern stream_format_t snappy_java_format;
 extern stream_format_t snappy_in_java_format;
 extern stream_format_t comment_43_format;
+extern stream_format_t raw_format;
 
 #endif /* SNZIP_H */

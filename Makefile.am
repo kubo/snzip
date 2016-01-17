@@ -1,5 +1,8 @@
 # Command line tool.
 snzip_SOURCES = snzip.c snzip.h snzip-format.c framing-format.c framing2-format.c snappy-java-format.c snappy-in-java-format.c comment-43-format.c crc32.c crc32.h
+if SUPPORT_RAW_FORMAT
+snzip_SOURCES += raw_format.cpp
+endif
 if HAVE_SSE4_2
 snzip_SOURCES += crc32_sse4_2.c
 endif

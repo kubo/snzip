@@ -3,7 +3,9 @@
  */
 #pragma warning(disable: 4267 4244 4334)
 
+#ifndef __cplusplus
 #define inline __inline
+#endif
 
 #if defined WIN64 || defined _WIN64
 #define ssize_t __int64
@@ -58,6 +60,4 @@ static __inline int __builtin_clz(unsigned long n)
 #define PACKAGE_STRING "@PACKAGE_STRING@"
 #define DEFAULT_FORMAT framing2_format
 #define HAVE_SSE4_2
-#define stat _stati64
-#define fstat _fstati64
 #include "ya_getopt.h"

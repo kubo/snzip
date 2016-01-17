@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil -*-
  *
- * Copyright 2011-2013 Kubo Takehiro <kubo@jiubao.org>
+ * Copyright 2011-2016 Kubo Takehiro <kubo@jiubao.org>
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -58,6 +58,10 @@
 #define OPTIMIZE_SEQUENTIAL ""
 #endif
 #include "snzip.h"
+#ifdef WIN32
+#define stat _stati64
+#define fstat _fstati64
+#endif
 
 #if defined HAVE_STRUCT_STAT_ST_MTIMENSEC
 #define SNZ_ST_TIME_NSEC(sbuf, type) ((sbuf).st_##type##timensec)
@@ -69,6 +73,8 @@
 #define SNZ_ST_TIME_NSEC(sbuf, type) (0)
 #endif
 
+int64_t uncompressed_source_len = -1;
+
 static int trace_flag = FALSE;
 
 static void copy_file_attributes(int infd, int outfd, const char *outfile);
@@ -76,6 +82,9 @@ static void show_usage(const char *progname, int exit_code);
 
 static stream_format_t *stream_formats[] = {
   &framing2_format,
+#ifdef SUPPORT_RAW_FORMAT
+  &raw_format,
+#endif
   &framing_format,
   &snzip_format,
   &snappy_java_format,
@@ -208,7 +217,9 @@ int main(int argc, char **argv)
     opt_keep = TRUE;
   }
 
-  while ((opt = getopt(argc, argv, "cdkt:hb:B:R:W:T")) != -1) {
+  while ((opt = getopt(argc, argv, "cdkt:hs:b:B:R:W:T")) != -1) {
+    char *endptr;
+
     switch (opt) {
     case 'c':
       opt_stdout = TRUE;
@@ -225,6 +236,13 @@ int main(int argc, char **argv)
       break;
     case 'h':
       show_usage(progname, 0);
+      break;
+    case 's':
+      uncompressed_source_len = strtoull(optarg, &endptr, 10);
+      if (*endptr != '\0') {
+        fprintf(stderr, "Invalid -s format: %s\n", optarg);
+        return 1;
+      }
       break;
     case 'b':
       block_size = atoi(optarg);
@@ -321,11 +339,13 @@ int main(int argc, char **argv)
 
     /* determine the file format */
     if (opt_uncompress) {
-      fmt = find_stream_format_by_file_header(infp);
+      if (format_name == NULL) {
+        fmt = find_stream_format_by_file_header(infp);
+        skip_magic = 1;
+      }
       if (fmt == NULL) {
         exit(1);
       }
-      skip_magic = 1;
     }
 
     /* check output file and open it. */
@@ -480,6 +500,10 @@ static void show_usage(const char *progname, int exit_code)
           "   -k       keep (don't delete) input files\n"
           "   -t name  file format name. see below. The default format is %s.\n"
           "   -h       give this help\n"
+          "\n"
+          "  raw_format option:\n"
+          "   -s size  size of input data when compressing.\n"
+          "            The default value is the file size if available.\n"
           "\n"
           "  tuning options:\n"
           "   -b num   internal block size in bytes\n"

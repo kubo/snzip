@@ -24,12 +24,14 @@ AC_DEFINE_UNQUOTED([DEFAULT_FORMAT], [${with_default_format}_format], [Default f
 
 # These are flags passed to automake (though they look like gcc flags!)
 AC_PROG_CC
+AC_PROG_CXX
 AC_GNU_SOURCE
 AC_C_BIGENDIAN
 AC_CANONICAL_HOST
 
 if test "$GCC"; then
    CFLAGS="$CFLAGS -Wall"
+   CXXFLAGS="$CXXFLAGS -Wall"
 fi
 
 AC_CHECK_HEADERS([unistd.h])
@@ -92,6 +94,7 @@ AC_ARG_WITH([snappy],
         [try this for a non-standard install prefix of the snappy library])],
     [
         CFLAGS="$CFLAGS -I$with_snappy/include"
+        CXXFLAGS="$CXXFLAGS -I$with_snappy/include"
         AS_CASE(["$host_os"],
             [linux*],   [LDFLAGS="$LDFLAGS -L$with_snappy/lib -Wl,-rpath,$with_snappy/lib"],
             [solaris*], [LDFLAGS="$LDFLAGS -L$with_snappy/lib -R$with_snappy/lib"],
@@ -101,6 +104,21 @@ AC_ARG_WITH([snappy],
 
 AC_CHECK_LIB([snappy], [snappy_compress], [],
 [AC_MSG_ERROR([Snappy library is not found.])])
+
+AC_LANG_PUSH(C++)
+AC_MSG_CHECKING([snappy::Uncompress(snappy::Source*, snappy::Sink*)])
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([#include <snappy.h>],
+    [snappy::Source *src=NULL; snappy::Sink *sink=NULL; snappy::Uncompress(src, sink);])],
+  [have_snappy_uncompress_src_sink=yes],
+  [have_snappy_uncompress_src_sink=no])
+AC_MSG_RESULT($have_snappy_uncompress_src_sink)
+AC_LANG_POP()
+
+AS_IF([test "x$have_snappy_uncompress_src_sink" = xyes],
+    [AC_DEFINE([SUPPORT_RAW_FORMAT], 1, [Define to 1 if snappy::Uncompress(snappy::Source*, snappy::Sink*) is available])],
+    [AC_MSG_WARN([raw format is not supported with this snappy version.])])
+AM_CONDITIONAL([SUPPORT_RAW_FORMAT], [test "x$have_snappy_uncompress_src_sink" = xyes])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile spec/snzip.spec win32/config.h])

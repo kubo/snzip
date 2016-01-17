@@ -133,6 +133,46 @@ If the program name includes `cat` such as snzcat, it acts as `-dc` is set.
 
     snzip -dc archive.tar.sz | tar xf -
 
+Raw format
+----------
+
+Note: This feature will be added in snzip 1.0.3.
+
+Unlike other formats, the raw format has a few limitations:
+(1) The total data length before compression must be known on compression.
+(2) Automatic file format detection doesn't work on uncompression.
+(3) The raw format support is enabled only when snzip is compiled for snappy 1.1.3 or upper.
+
+### To compress file.tar:
+
+    snzip -t raw file.tar
+
+or
+
+    snzip -t raw < file.tar > file.tar.raw
+
+In these examples, snzip uses a file descriptor, which directly opens
+the `file.tar` file, and gets the file length to be compressed.
+However the following command doesn't work.
+
+    cat file.tar | snzip -t raw > file.tar.raw
+
+It uses a pipe. snzip cannot get the total length before compression.
+The totel length must be specified by the `-s` option in this case.
+
+    cat file.tar | snzip -t raw -s "size of file.tar" > file.tar.raw
+
+### To uncompress file.tar.sz:
+
+    snzip -t raw -d file.tar.sz
+
+or
+
+    snunzip -t raw file.tar.sz
+
+You need to set the `-t raw` option to tell snzip the format of the
+file to be uncompressed.
+
 SNZ File format
 ---------------
 
