@@ -136,19 +136,12 @@ static int read_data(char *buf, size_t buflen, FILE *fp)
 
 /*
  * Callers must ensure that the checksum pointer is aligned to a 4 byte boundary
- * on little endian environment.
+ * if the CPU disallows unaligned accesss.
  */
 static int check_crc32c(const char *data, size_t datalen, const char *checksum)
 {
   unsigned int actual_crc32c = masked_crc32c(data, datalen);
-#ifdef WORDS_BIGENDIAN
-  unsigned int expected_crc32c = ((unsigned int)checksum[0] & 0xff)
-    | (((unsigned int)checksum[1] & 0xff) << 8)
-    | (((unsigned int)checksum[2] & 0xff) << 16)
-    | (((unsigned int)checksum[3] & 0xff) << 24);
-#else
-  unsigned int expected_crc32c = *(unsigned int*)checksum;
-#endif
+  unsigned int expected_crc32c = SNZ_FROM_LE32(*(unsigned int*)checksum);
   if (actual_crc32c != expected_crc32c) {
     print_error("CRC32C error! (expected 0x%08x but 0x%08x)\n", expected_crc32c, actual_crc32c);
     return -1;

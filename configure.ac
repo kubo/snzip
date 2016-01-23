@@ -34,7 +34,7 @@ if test "$GCC"; then
    CXXFLAGS="$CXXFLAGS -Wall"
 fi
 
-AC_CHECK_HEADERS([unistd.h])
+AC_CHECK_HEADERS([unistd.h byteswap.h])
 
 AC_SYS_LARGEFILE
 AC_CHECK_FUNCS(posix_fadvise futimens futimes)

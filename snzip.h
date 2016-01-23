@@ -77,6 +77,35 @@
 #define feof_unlocked feof
 #endif
 
+#ifdef HAVE_BYTESWAP_H
+#include <byteswap.h>
+#endif
+
+#if defined bswap_32
+#define SNZ_BSWAP32(x) bswap_32(x)  /* in byteswap.h (linux) */
+#elif defined _MSC_VER
+#include <intrin.h>
+#define SNZ_BSWAP32(x) _byteswap_ulong(x)  /* in intrin.h (msvc) */
+#else
+#define SNZ_BSWAP32(x) \
+    ((((x) >> 24) & 0x000000ffu) |
+     (((x) >> 8)  & 0x0000ff00u) |
+     (((x) << 8)  & 0x00ff0000u) |
+     (((x) << 24) & 0xff000000u))
+#endif
+
+#ifdef WORDS_BIGENDIAN
+#define SNZ_TO_LE32(x)    SNZ_BSWAP32(x)
+#define SNZ_FROM_LE32(x)  SNZ_BSWAP32(x)
+#define SNZ_TO_BE32(x)    (x)
+#define SNZ_FROM_BE32(x)  (x)
+#else
+#define SNZ_TO_LE32(x)    (x)
+#define SNZ_FROM_LE32(x)  (x)
+#define SNZ_TO_BE32(x)    SNZ_BSWAP32(x)
+#define SNZ_FROM_BE32(x)  SNZ_BSWAP32(x)
+#endif
+
 /* logging functions */
 extern int trc_lineno;
 extern const char *trc_filename;
