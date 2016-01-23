@@ -74,6 +74,9 @@
 #endif
 
 int64_t uncompressed_source_len = -1;
+int32_t snzip_format_block_size;
+uint32_t hadoop_snappy_source_length;
+uint32_t hadoop_snappy_compressed_length;
 
 static int trace_flag = FALSE;
 
@@ -120,17 +123,27 @@ static stream_format_t *find_stream_format_by_file_header(FILE *fp)
 {
   /*  framing        {0xff, 0x06, 0x00, 's',  'N',  'a',  'P',  'p',  'Y'}
    *  framing2       {0xff, 0x06, 0x00, 0x00, 's',  'N',  'a',  'P',  'p',  'Y'}
-   *  snzip          {'S',  'N',  'Z'}
+   *  hadoop-snappy  {--uncompressed length--,--compressed length--,
+   *  snzip          {'S',  'N',  'Z',  0x01, block_size}
    *  snappy-java    {0x82, 'S',  'N',  'A',  'P',  'P',  'Y',  0x00}
    *  snappy-in-java {'s',  'n',  'a',  'p',  'p',  'y',  0x00}
    */
-#define CHK(chr) if (getc_unlocked(fp) != (chr)) goto error
-  switch (getc_unlocked(fp)) {
+  union {
+    uint8_t buf[10];
+    uint32_t len[2];
+  } u;
+  size_t idx = 0;
+  int chr;
+  size_t max_compressed_length;
+
+#define GETCHAR()  ((chr = getc_unlocked(fp)), (u.buf[idx++] = chr), chr)
+#define CHK(chr) if (GETCHAR() != (chr)) goto error
+  switch (GETCHAR()) {
   case 0xff:
     CHK(0x06); CHK(0x00);
-    switch (getc_unlocked(fp)) {
+    switch (GETCHAR()) {
     case 's':
-      switch (getc_unlocked(fp)) {
+      switch (GETCHAR()) {
       case 'N':
         CHK('a'); CHK('P'); CHK('p'); CHK('Y');
         return &framing_format;
@@ -145,7 +158,11 @@ static stream_format_t *find_stream_format_by_file_header(FILE *fp)
     }
     break;
   case 'S':
-    CHK('N'); CHK('Z');
+    CHK('N'); CHK('Z'); CHK(0x01);
+    snzip_format_block_size = GETCHAR();
+    if (snzip_format_block_size <= 0) {
+      goto error;
+    }
     return &snzip_format;
   case 0x82:
     CHK('S'); CHK('N'); CHK('A'); CHK('P'); CHK('P'); CHK('Y'); CHK(0x00);
@@ -155,6 +172,16 @@ static stream_format_t *find_stream_format_by_file_header(FILE *fp)
     return &snappy_in_java_format;
   }
  error:
+  while (idx < sizeof(u.len)) {
+    GETCHAR();
+  }
+  hadoop_snappy_source_length = SNZ_FROM_BE32(u.len[0]);
+  hadoop_snappy_compressed_length = SNZ_FROM_BE32(u.len[1]);
+  max_compressed_length = snappy_max_compressed_length(hadoop_snappy_max_input_size(0));
+  if (hadoop_snappy_compressed_length <= max_compressed_length) {
+    /* This may be hadoop-snappy format */
+    return &hadoop_snappy_format;
+  }
   fprintf(stderr, "Unknown file header\n");
   return NULL;
 }

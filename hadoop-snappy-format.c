@@ -40,7 +40,7 @@
 #define SNAPPY_BUFFER_SIZE_DEFAULT (256 * 1024)
 
 /* Get same value with BlockCompressorStream.MAX_INPUT_SIZE */
-static size_t calc_max_input_size(size_t block_size)
+size_t hadoop_snappy_max_input_size(size_t block_size)
 {
   const size_t buffer_size = block_size ? block_size : SNAPPY_BUFFER_SIZE_DEFAULT;
   const size_t compression_overhead = (buffer_size / 6) + 32;
@@ -63,7 +63,7 @@ static int hadoop_snappy_format_compress(FILE *infp, FILE *outfp, size_t block_s
   size_t uncompressed_data_len;
   int err = 1;
 
-  work_buffer_init(&wb, calc_max_input_size(block_size));
+  work_buffer_init(&wb, hadoop_snappy_max_input_size(block_size));
 
   /* write file body */
   while ((uncompressed_data_len = fread_unlocked(wb.uc, 1, wb.uclen, infp)) > 0) {
@@ -122,7 +122,16 @@ static int hadoop_snappy_format_uncompress(FILE *infp, FILE *outfp, int skip_mag
   size_t compressed_len = 0;
   int err = 1;
 
-  work_buffer_init(&wb, calc_max_input_size(0));
+  work_buffer_init(&wb, hadoop_snappy_max_input_size(0));
+
+  if (skip_magic) {
+    source_len = hadoop_snappy_source_length;
+    compressed_len = hadoop_snappy_compressed_length;
+    trace("source_len = %ld.\n", (long)source_len);
+    trace("compressed_len = %ld.\n", (long)compressed_len);
+    goto after_reading_compressed_len;
+  }
+
   for (;;) {
     unsigned int n;
 
@@ -135,6 +144,7 @@ static int hadoop_snappy_format_uncompress(FILE *infp, FILE *outfp, int skip_mag
       goto cleanup;
     }
     source_len = SNZ_FROM_BE32(n);
+    trace("source_len = %ld.\n", (long)source_len);
 
     while (source_len > 0) {
       size_t uncompressed_len;
@@ -143,6 +153,8 @@ static int hadoop_snappy_format_uncompress(FILE *infp, FILE *outfp, int skip_mag
         goto cleanup;
       }
       compressed_len = SNZ_FROM_BE32(n);
+      trace("compressed_len = %ld.\n", (long)compressed_len);
+    after_reading_compressed_len:
       if (compressed_len > wb.clen) {
         work_buffer_resize(&wb, compressed_len, 0);
       }
@@ -181,6 +193,7 @@ static int hadoop_snappy_format_uncompress(FILE *infp, FILE *outfp, int skip_mag
       trace("write %ld bytes\n", (long)uncompressed_len);
 
       source_len -= uncompressed_len;
+      trace("uncompressed_len = %ld, source_len -> %ld\n", (long)uncompressed_len, (long)source_len);
     }
   }
   /* check stream errors */

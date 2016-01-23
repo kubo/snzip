@@ -138,6 +138,9 @@ typedef struct {
 } stream_format_t;
 
 extern int64_t uncompressed_source_len;
+extern int32_t snzip_format_block_size;
+extern uint32_t hadoop_snappy_source_length;
+extern uint32_t hadoop_snappy_compressed_length;
 
 extern stream_format_t snzip_format;
 extern stream_format_t framing_format;
@@ -147,5 +150,8 @@ extern stream_format_t snappy_in_java_format;
 extern stream_format_t comment_43_format;
 extern stream_format_t raw_format;
 extern stream_format_t hadoop_snappy_format;
+
+/* hadoop-snapp-format.c */
+size_t hadoop_snappy_max_input_size(size_t block_size);
 
 #endif /* SNZIP_H */

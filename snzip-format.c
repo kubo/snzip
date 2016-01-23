@@ -163,11 +163,7 @@ static int snzip_uncompress(FILE *infp, FILE *outfp, int skip_magic)
   wb.uc = NULL;
 
   if (skip_magic) {
-    /* read header except magic */
-    if (fread_unlocked(&header.version, sizeof(header) - sizeof(header.magic), 1, infp) != 1) {
-      print_error("Failed to read a file: %s\n", strerror(errno));
-      goto cleanup;
-    }
+    header.block_size = snzip_format_block_size;
   } else {
     /* read header */
     if (fread_unlocked(&header, sizeof(header), 1, infp) != 1) {
@@ -180,11 +176,11 @@ static int snzip_uncompress(FILE *infp, FILE *outfp, int skip_magic)
       print_error("This is not a snz file.\n");
       goto cleanup;
     }
-  }
-  /* check rest header */
-  if (header.version != SNZ_FILE_VERSION) {
-    print_error("Unknown snz version %d\n", header.version);
-    goto cleanup;
+    /* check rest header */
+    if (header.version != SNZ_FILE_VERSION) {
+      print_error("Unknown snz version %d\n", header.version);
+      goto cleanup;
+    }
   }
   if (header.block_size > SNZ_MAX_BLOCK_SIZE) {
     print_error("Invalid block size %d (max %d)\n", header.block_size, SNZ_MAX_BLOCK_SIZE);
