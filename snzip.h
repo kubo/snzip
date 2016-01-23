@@ -146,5 +146,6 @@ extern stream_format_t snappy_java_format;
 extern stream_format_t snappy_in_java_format;
 extern stream_format_t comment_43_format;
 extern stream_format_t raw_format;
+extern stream_format_t hadoop_snappy_format;
 
 #endif /* SNZIP_H */

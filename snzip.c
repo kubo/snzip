@@ -82,6 +82,7 @@ static void show_usage(const char *progname, int exit_code);
 
 static stream_format_t *stream_formats[] = {
   &framing2_format,
+  &hadoop_snappy_format,
 #ifdef SUPPORT_RAW_FORMAT
   &raw_format,
 #endif
