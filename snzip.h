@@ -88,9 +88,9 @@
 #define SNZ_BSWAP32(x) _byteswap_ulong(x)  /* in intrin.h (msvc) */
 #else
 #define SNZ_BSWAP32(x) \
-    ((((x) >> 24) & 0x000000ffu) |
-     (((x) >> 8)  & 0x0000ff00u) |
-     (((x) << 8)  & 0x00ff0000u) |
+    ((((x) >> 24) & 0x000000ffu) | \
+     (((x) >> 8)  & 0x0000ff00u) | \
+     (((x) << 8)  & 0x00ff0000u) | \
      (((x) << 24) & 0xff000000u))
 #endif
 
