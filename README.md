@@ -4,10 +4,10 @@ Snzip, a compression/decompression tool based on snappy.
 What is snzip.
 --------------
 
-Snzip is one of command line tools using [snappy][]. This supports five types of
-file formats; [framing-format][], [old framing-format][] and obsolete three formats
-used by snzip, [snappy-java][] and [snappy-in-java][] before official framing-format
-was defined. The default format is [framing-format][].
+Snzip is one of command line tools using [snappy][]. This supports several file
+formats; [framing-format][], [old framing-format][], [hadoop-snappy format][], [raw format][]
+and obsolete three formats used by snzip, [snappy-java][] and [snappy-in-java][]
+before official framing-format was defined. The default format is [framing-format][].
 
 Notable Changes
 ---------------
@@ -21,11 +21,11 @@ Installation
 
 ### Install from a tar-ball
 
-Download snzip-1.0.2.tar.gz from https://bintray.com/kubo/generic/snzip,
+Download snzip-1.0.3.tar.gz from https://bintray.com/kubo/generic/snzip,
 uncompress and untar it, and run configure.
 
-    tar xvfz snzip-1.0.2.tar.gz
-    cd snzip-1.0.2
+    tar xvfz snzip-1.0.3.tar.gz
+    cd snzip-1.0.3
     ./configure
 
 If you didn't install snappy under `/usr` or `/usr/local`, you need to specify
@@ -40,8 +40,8 @@ the location by `--with-snappy` as follows.
     cd ..
     
     # install snzip
-    tar xvfz snzip-1.0.2.tar.gz
-    cd snzip-1.0.2
+    tar xvfz snzip-1.0.3.tar.gz
+    cd snzip-1.0.3
     ./configure --with-snappy=/usr/local/snappy
 
 You can use `--with-default-format` to change the default compression format.
@@ -50,12 +50,12 @@ You can use `--with-default-format` to change the default compression format.
 
 ### Install as a rpm package
 
-We don't provide rpm packages. You need to download snzip-1.0.2.tar.gz
+We don't provide rpm packages. You need to download snzip-1.0.3.tar.gz
 from https://bintray.com/kubo/generic/snzip, create a rpm package as follows and
 install it.
 
     # The rpm package will be created under $HOME/rpmbuild/RPMS.
-    rpmbuild -tb snzip-1.0.2.tar.gz 
+    rpmbuild -tb snzip-1.0.3.tar.gz 
 
 ### Install from the latest source
 
@@ -68,7 +68,7 @@ To use source code in the github repository.
 
 ### Install a Windows package.
 
-Download `snzip-1.0.2-win32.zip` or `snzip-1.0.2-win64.zip` from
+Download `snzip-1.0.3-win32.zip` or `snzip-1.0.3-win64.zip` from
 https://bintray.com/kubo/generic/snzip and copy `snzip.exe` and `snunzip.exe`
 to a directory in the PATH environment variable.
 
@@ -80,7 +80,8 @@ Usage
     snzip file.tar
 
 Compressed file name is `file.tar.sz` and the original file is deleted.
-Timestamp, mode and permissions are not changed as possible as it can.
+The file attributes such as timestamp, mode and permissions are not changed
+as possible as it can.
 
 The compressed file's format is [framing-format][]. You need to add an option `-t snappy-java` or
 `-t snappy-in-java` to use other formats.
@@ -114,7 +115,8 @@ or
     snunzip file.tar.sz
 
 Uncompressed file name is `file.tar` and the original file is deleted.
-Timestamp, mode and permissions are not changed as possible as it can.
+The file attributes such as timestamp, mode and permissions are not changed
+as possible as it can.
 
 If the program name includes `un` such as `snunzip`, it acts as `-d` is set.
 
@@ -136,9 +138,8 @@ If the program name includes `cat` such as snzcat, it acts as `-dc` is set.
 Raw format
 ----------
 
-Note: This feature will be added in snzip 1.0.3.
-
-Unlike other formats, the raw format has a few limitations:
+Raw format is native format of snappy.
+Unlike other formats, there are a few limitations:
 (1) The total data length before compression must be known on compression.
 (2) Automatic file format detection doesn't work on uncompression.
 (3) The raw format support is enabled only when snzip is compiled for snappy 1.1.3 or upper.
@@ -158,7 +159,7 @@ However the following command doesn't work.
     cat file.tar | snzip -t raw > file.tar.raw
 
 It uses a pipe. snzip cannot get the total length before compression.
-The totel length must be specified by the `-s` option in this case.
+The total length must be specified by the `-s` option in this case.
 
     cat file.tar | snzip -t raw -s "size of file.tar" > file.tar.raw
 
@@ -172,6 +173,36 @@ or
 
 You need to set the `-t raw` option to tell snzip the format of the
 file to be uncompressed.
+
+Hadoop-snappy format
+--------------------
+
+Hadoop-snappy format is one of the compression formats used in Hadoop.
+It uses its own framing format as follows:
+
+* A compressed file consists of one or more blocks.
+* A block consists of uncompressed length (big endian 4 byte integer) and one or more subblocks.
+* A subblock consists of compressed length (big endian 4 byte integer) and raw compressed data.
+
+### To compress a file:
+
+    snzip -t hadoop-snappy file_name
+
+The default block size used by `snzip` for hadoop-snappy format is 256k.
+It is same with the default value of the `io.compression.codec.snappy.buffersize`
+parameter. If the block size used by `snzip` is larger than the parameter,
+you would get an InternalError `Could not decompress data. Buffer length is too small`
+while hadoop is reading a file compressed by snzip. You need to change the block
+size by the `-b` option as follows if you get the error.
+
+    # if  io.compression.codec.snappy.buffersize is 32768
+    snzip -t hadoop-snappy -b 32768 file_name_to_be_compressed
+
+### To uncompress a file:
+
+    snzip compressed_file.snappy
+
+The file format is guessed by the first 8 bytes of the file.
 
 SNZ File format
 ---------------
@@ -207,3 +238,5 @@ License
 [old framing-format]: https://github.com/google/snappy/blob/0755c815197dacc77d8971ae917c86d7aa96bf8e/framing_format.txt
 [snappy-java]: https://github.com/xerial/snappy-java
 [snappy-in-java]: https://github.com/dain/snappy
+[raw format]: https://github.com/kubo/snzip#raw-format
+[Hadoop-snappy format]: https://github.com/kubo/snzip#hadoop-snappy-format
