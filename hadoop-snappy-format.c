@@ -37,9 +37,19 @@
 #include <snappy-c.h>
 #include "snzip.h"
 
+/* same with CommonConfigurationKeys.IO_COMPRESSION_CODEC_SNAPPY_BUFFERSIZE_DEFAULT in hadoop */
 #define SNAPPY_BUFFER_SIZE_DEFAULT (256 * 1024)
 
-/* Get same value with BlockCompressorStream.MAX_INPUT_SIZE */
+/* Calculate max_input_size from block_size as in hadoop-snappy.
+ *
+ * In SnappyCodec.createOutputStream(OutputStream out, Compressor compressor)
+ *
+ *     int compressionOverhead = (bufferSize / 6) + 32;
+ *
+ * In BlockCompressorStream(OutputStream out, Compressor compressor, int bufferSize, int compressionOverhead)
+ *
+ *     MAX_INPUT_SIZE = bufferSize - compressionOverhead;
+ */
 size_t hadoop_snappy_max_input_size(size_t block_size)
 {
   const size_t buffer_size = block_size ? block_size : SNAPPY_BUFFER_SIZE_DEFAULT;
