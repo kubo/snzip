@@ -150,6 +150,7 @@ extern stream_format_t snappy_in_java_format;
 extern stream_format_t comment_43_format;
 extern stream_format_t raw_format;
 extern stream_format_t hadoop_snappy_format;
+extern stream_format_t iwa_format;
 
 /* hadoop-snapp-format.c */
 size_t hadoop_snappy_max_input_size(size_t block_size);

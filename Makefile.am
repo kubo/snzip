@@ -5,6 +5,7 @@ snzip_SOURCES = snzip.c \
 	framing-format.c \
 	framing2-format.c \
 	hadoop-snappy-format.c \
+	iwa-format.c \
 	snappy-java-format.c \
 	snappy-in-java-format.c \
 	comment-43-format.c \

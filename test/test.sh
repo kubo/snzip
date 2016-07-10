@@ -46,7 +46,7 @@ run_test() {
         cat $TESTDIR/$testfile.tmp.$ext | $SNZIP $opt -t $format -d > $TESTDIR/$testfile.tmp
         cmp $TESTDIR/$testfile.tmp $TESTDIR/plain/$testfile
 
-        if test $format != raw; then
+        if test $format != raw -a $format != iwa; then
             echo uncompress $testfile.tmp.$ext with autodetect
             $SNZIP $opt -d $TESTDIR/$testfile.tmp.$ext
             cmp $TESTDIR/$testfile.tmp $TESTDIR/plain/$testfile
@@ -61,6 +61,7 @@ run_test comment-43     snappy  "" alice29.txt house.jpg
 run_test framing        sz      "" alice29.txt house.jpg
 run_test framing2       sz      "" alice29.txt house.jpg
 run_test hadoop-snappy  snappy  "-b 65536" alice29.txt house.jpg
+run_test iwa            iwa     "" alice29.txt house.jpg
 run_test snappy-in-java snappy  "" alice29.txt house.jpg
 run_test snappy-java    snappy  "" alice29.txt house.jpg
 run_test snzip          snz     "" alice29.txt house.jpg

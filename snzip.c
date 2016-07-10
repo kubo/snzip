@@ -89,6 +89,7 @@ static stream_format_t *stream_formats[] = {
 #ifdef SUPPORT_RAW_FORMAT
   &raw_format,
 #endif
+  &iwa_format,
   &framing_format,
   &snzip_format,
   &snappy_java_format,
