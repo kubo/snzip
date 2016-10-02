@@ -160,6 +160,7 @@
     <ClCompile Include="..\framing2-format.c" />
     <ClCompile Include="..\raw_format.cpp" />
     <ClCompile Include="..\hadoop-snappy-format.c" />
+    <ClCompile Include="..\iwa-format.c" />
     <ClCompile Include="..\snappy-in-java-format.c" />
     <ClCompile Include="..\snappy-java-format.c" />
     <ClCompile Include="..\snzip-format.c" />
