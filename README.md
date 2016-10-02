@@ -121,6 +121,7 @@ as possible as it can.
 If the program name includes `un` such as `snunzip`, it acts as `-d` is set.
 
 The file format is automatically determined from the file header.
+However it doesn't work for some file formats such as raw and Apple iWork .iwa.
 
 ### To uncompress file.tar.sz and output to standard out.
 
@@ -144,7 +145,7 @@ Unlike other formats, there are a few limitations:
 (2) Automatic file format detection doesn't work on uncompression.
 (3) The raw format support is enabled only when snzip is compiled for snappy 1.1.3 or upper.
 
-### To compress file.tar:
+### To compress file.tar as raw format:
 
     snzip -t raw file.tar
 
@@ -163,7 +164,7 @@ The total length must be specified by the `-s` option in this case.
 
     cat file.tar | snzip -t raw -s "size of file.tar" > file.tar.raw
 
-### To uncompress file.tar.sz:
+### To uncompress file.tar.sz compressed as raw format
 
     snzip -t raw -d file.tar.sz
 
@@ -184,7 +185,7 @@ It uses its own framing format as follows:
 * A block consists of uncompressed length (big endian 4 byte integer) and one or more subblocks.
 * A subblock consists of compressed length (big endian 4 byte integer) and raw compressed data.
 
-### To compress a file:
+### To compress a file as hadoop-snappy format
 
     snzip -t hadoop-snappy file_name
 
@@ -198,11 +199,22 @@ size by the `-b` option as follows if you get the error.
     # if  io.compression.codec.snappy.buffersize is 32768
     snzip -t hadoop-snappy -b 32768 file_name_to_be_compressed
 
-### To uncompress a file:
+### To uncompress a file compressed as haddoop-snappy format
 
     snzip compressed_file.snappy
 
 The file format is guessed by the first 8 bytes of the file.
+
+Apple iWork .iwa format
+-----------------------
+
+Apple iWork .iwa format is a file format used by Apple iWork. The format was
+demystified [here](https://github.com/obriensp/iWorkFileFormat).
+Basically the .iwa format consists of a Protobuf stream [compressed by Snappy](https://github.com/obriensp/iWorkFileFormat/blob/master/Docs/index.md#snappy-compression).
+
+Snzip uncompresses .iwa files to Protbuf streams and compresses Protobuf streams
+to .iwa files. You need to set `-t iwa` on compression and uncompression to
+specify the file format.
 
 SNZ File format
 ---------------
