@@ -28,6 +28,14 @@ dist_doc_DATA = AUTHORS ChangeLog COPYING INSTALL NEWS README.md
 dist-hook:
 	git log > $(distdir)/ChangeLog
 
+install-exec-hook:
+	ln $(DESTDIR)$(bindir)/snzip$(EXEEXT) $(DESTDIR)$(bindir)/snunzip$(EXEEXT)
+	ln $(DESTDIR)$(bindir)/snzip$(EXEEXT) $(DESTDIR)$(bindir)/snzcat$(EXEEXT)
+
+uninstall-hook:
+	rm -f $(DESTDIR)$(bindir)/snunzip$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/snzcat$(EXEEXT)
+
 # Use CFLAGS_SSE4_2 only for crc32_sse4_2.c.
 # Otherwise, SSE4.2 instructions may be used elsewhere.
 crc32_sse4_2.o: crc32_sse4_2.c crc32.h
