@@ -27,6 +27,8 @@ uncompress and untar it, and run configure.
     tar xvfz snzip-1.0.4.tar.gz
     cd snzip-1.0.4
     ./configure
+    make
+    make install
 
 If you didn't install snappy under `/usr` or `/usr/local`, you need to specify
 the location by `--with-snappy` as follows.
@@ -43,6 +45,8 @@ the location by `--with-snappy` as follows.
     tar xvfz snzip-1.0.4.tar.gz
     cd snzip-1.0.4
     ./configure --with-snappy=/usr/local/snappy
+    make
+    make install
 
 You can use `--with-default-format` to change the default compression format.
 
@@ -65,6 +69,8 @@ To use source code in the github repository.
     cd snzip
     ./autogen.sh
     ./configure
+    make
+    make install
 
 ### Install a Windows package.
 
@@ -201,7 +207,7 @@ size by the `-b` option as follows if you get the error.
 
 ### To uncompress a file compressed as haddoop-snappy format
 
-    snzip compressed_file.snappy
+    snzip -d compressed_file.snappy
 
 The file format is guessed by the first 8 bytes of the file.
 
