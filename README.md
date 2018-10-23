@@ -48,6 +48,13 @@ the location by `--with-snappy` as follows.
     make
     make install
 
+When both dynamic and static snappy libraries are available, the former
+is used by default. The compiled `snzip` depends on `libsnappy.so`.
+When `--with-static-snappy` is passed as a configure option, the latter
+is used. The compiled `snzip` includes snappy library.
+
+Note: `--with-static-snappy` isn't available on some platforms.
+
 You can use `--with-default-format` to change the default compression format.
 
     ./configure --with-default-format=snzip

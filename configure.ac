@@ -102,10 +102,23 @@ AC_ARG_WITH([snappy],
     ],
     [])
 
+AC_LANG_PUSH(C++)
+saved_LIBS="$LIBS"
 AC_CHECK_LIB([snappy], [snappy_compress], [],
 [AC_MSG_ERROR([Snappy library is not found.])])
 
-AC_LANG_PUSH(C++)
+AC_ARG_WITH([static-snappy],
+    [AS_HELP_STRING([--with-static-snappy],
+        [use static version of snappy library])],
+    [
+        AC_MSG_CHECKING([whether -Bstatic and -Bdynamic are available])
+        LIBS="-Wl,-Bstatic -lsnappy -Wl,-Bdynamic $saved_LIBS"
+        AC_TRY_LINK([], [],
+            [AC_MSG_RESULT(yes)],
+            [AC_MSG_RESULT(no); AC_MSG_ERROR([--with-static-snappy isn't available on this platform])])
+    ],
+    [])
+
 AC_MSG_CHECKING([snappy::Uncompress(snappy::Source*, snappy::Sink*)])
 AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([#include <snappy.h>],
