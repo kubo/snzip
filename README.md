@@ -21,7 +21,7 @@ Installation
 
 ### Install from a tar-ball
 
-Download snzip-1.0.4.tar.gz from https://bintray.com/kubo/generic/snzip,
+Download snzip-1.0.4.tar.gz from https://github.com/kubo/snzip/releases,
 uncompress and untar it, and run configure.
 
     tar xvfz snzip-1.0.4.tar.gz
@@ -62,7 +62,7 @@ You can use `--with-default-format` to change the default compression format.
 ### Install as a rpm package
 
 We don't provide rpm packages. You need to download snzip-1.0.4.tar.gz
-from https://bintray.com/kubo/generic/snzip, create a rpm package as follows and
+from https://github.com/kubo/snzip/releases, create a rpm package as follows and
 install it.
 
     # The rpm package will be created under $HOME/rpmbuild/RPMS.
@@ -82,7 +82,7 @@ To use source code in the github repository.
 ### Install a Windows package.
 
 Download `snzip-1.0.4-win32.zip` or `snzip-1.0.4-win64.zip` from
-https://bintray.com/kubo/generic/snzip and copy `snzip.exe` and `snunzip.exe`
+https://github.com/kubo/snzip/releases and copy `snzip.exe` and `snunzip.exe`
 to a directory in the PATH environment variable.
 
 Usage
