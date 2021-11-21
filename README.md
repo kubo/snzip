@@ -33,18 +33,10 @@ uncompress and untar it, and run configure.
 If you didn't install snappy under `/usr` or `/usr/local`, you need to specify
 the location by `--with-snappy` as follows.
 
-    # install snappy
-    tar xvfz snappy-1.1.3.tar.gz
-    cd snappy-1.1.3
-    ./configure --prefix=/usr/local/snappy
-    make
-    make install
-    cd ..
-    
     # install snzip
     tar xvfz snzip-1.0.4.tar.gz
     cd snzip-1.0.4
-    ./configure --with-snappy=/usr/local/snappy
+    ./configure --with-snappy=/xxx/yyy/
     make
     make install
 
@@ -258,7 +250,7 @@ License
 
 2-clause BSD-style license.
 
-[snappy]: http://google.github.io/snappy/
+[snappy]: https://github.com/google/snappy/blob/master/docs/README.md
 [framing-format]: https://github.com/google/snappy/blob/master/framing_format.txt
 [old framing-format]: https://github.com/google/snappy/blob/0755c815197dacc77d8971ae917c86d7aa96bf8e/framing_format.txt
 [snappy-java]: https://github.com/xerial/snappy-java
