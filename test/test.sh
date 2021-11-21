@@ -34,6 +34,12 @@ run_test() {
         # check result
         cmp $TESTDIR/$testfile.tmp $TESTDIR/plain/$testfile
         rm $TESTDIR/$testfile.tmp
+        if test $format = framing -o $format = framing2; then
+            echo uncompress concatincated compressed $testfile
+            cat $TESTDIR/$testfile.tmp.$ext $TESTDIR/$testfile.tmp.$ext | $SNZIP $opt -t $format -d > $TESTDIR/$testfile.tmp
+            cat $TESTDIR/plain/$testfile $TESTDIR/plain/$testfile | cmp $TESTDIR/$testfile.tmp -
+            rm $TESTDIR/$testfile.tmp
+        fi
         rm $TESTDIR/$testfile.tmp.$ext
 
         for f in $TESTDIR/$format/$testfile.$ext*; do
