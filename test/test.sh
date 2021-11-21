@@ -17,42 +17,37 @@ run_test() {
         testfile=$1
         shift
 
-        echo compress $testfile
+        echo compress and decompress $testfile on disk
+        # compress a file on disk
         $SNZIP $opt -t $format -c $TESTDIR/plain/$testfile > $TESTDIR/$testfile.tmp.$ext
-        status=
-        for f in $TESTDIR/$format/$testfile.$ext*; do
-            if cmp $TESTDIR/$testfile.tmp.$ext $f >/dev/null 2>&1; then
-                status=OK
-            fi
-        done
-        if ! test "$status"; then
-            echo "$TESTDIR/$testfile.tmp.$ext doesn't match: `echo $TESTDIR/$format/$testfile.$ext*`"
-            exit 1
-        fi
-
-        cat $TESTDIR/plain/$testfile | $SNZIP $opt -t $format -s $(stat -c %s $TESTDIR/plain/$testfile) > $TESTDIR/$testfile.tmp.$ext
-        status=
-        for f in $TESTDIR/$format/$testfile.$ext*; do
-            if cmp $TESTDIR/$testfile.tmp.$ext $f >/dev/null 2>&1; then
-                status=OK
-            fi
-        done
-        if ! test "$status"; then
-            echo "$TESTDIR/$testfile.tmp.$ext doesn't match: `echo $TESTDIR/$format/$testfile.$ext*`"
-            exit 1
-        fi
-
-        echo uncompress $testfile.tmp.$ext without autodetect
-        cat $TESTDIR/$testfile.tmp.$ext | $SNZIP $opt -t $format -d > $TESTDIR/$testfile.tmp
+        # decompress a file on disk
+        $SNZIP $opt -t $format -d $TESTDIR/$testfile.tmp.$ext
+        # check result
         cmp $TESTDIR/$testfile.tmp $TESTDIR/plain/$testfile
-
-        if test $format != raw -a $format != iwa; then
-            echo uncompress $testfile.tmp.$ext with autodetect
-            $SNZIP $opt -d $TESTDIR/$testfile.tmp.$ext
-            cmp $TESTDIR/$testfile.tmp $TESTDIR/plain/$testfile
-        fi
-
         rm $TESTDIR/$testfile.tmp
+
+        echo compress and decompress $testfile from stdin
+        # compress stdin
+        cat $TESTDIR/plain/$testfile | $SNZIP $opt -t $format -s $(stat -c %s $TESTDIR/plain/$testfile) > $TESTDIR/$testfile.tmp.$ext
+        # decompress
+        cat $TESTDIR/$testfile.tmp.$ext | $SNZIP $opt -t $format -d > $TESTDIR/$testfile.tmp
+        # check result
+        cmp $TESTDIR/$testfile.tmp $TESTDIR/plain/$testfile
+        rm $TESTDIR/$testfile.tmp
+        rm $TESTDIR/$testfile.tmp.$ext
+
+        for f in $TESTDIR/$format/$testfile.$ext*; do
+            echo uncompress compressed $f without autodetect
+            cat $f | $SNZIP $opt -t $format -d > $TESTDIR/$testfile.tmp
+            cmp $TESTDIR/$testfile.tmp $TESTDIR/plain/$testfile
+            rm $TESTDIR/$testfile.tmp
+            if test $format != raw -a $format != iwa; then
+                echo uncompress compressed $f with autodetect
+                cat $f | $SNZIP $opt -d > $TESTDIR/$testfile.tmp
+                cmp $TESTDIR/$testfile.tmp $TESTDIR/plain/$testfile
+                rm $TESTDIR/$testfile.tmp
+            fi
+        done
     done
     echo ""
 }
