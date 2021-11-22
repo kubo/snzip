@@ -226,7 +226,12 @@ static int framing_format_uncompress(FILE *infp, FILE *outfp, int skip_magic)
       goto cleanup;
     } else {
       /* 4.5. Reserved skippable chunks (chunk types 0x80-0xfe) */
-      fseek(infp, data_len, SEEK_CUR);
+      while (data_len-- > 0) {
+        if (getc_unlocked(infp) == EOF) {
+          print_error("Unexpected end of file\n");
+          goto cleanup;
+        }
+      }
     }
   }
   /* check stream errors */
