@@ -46,35 +46,39 @@
 
 /* unlocked stdio functions */
 #if defined _IO_getc_unlocked
-#define getc_unlocked _IO_getc_unlocked
-#elif !defined HAVE_GETC_UNLOCKED
-#define getc_unlocked getc
+#undef getc
+#define getc _IO_getc_unlocked
+#elif defined HAVE_GETC_UNLOCKED
+#undef getc
+#define getc getc_unlocked
 #endif
 
 #if defined _IO_putc_unlocked
-#define putc_unlocked _IO_putc_unlocked
-#elif !defined HAVE_PUTC_UNLOCKED
-#define putc_unlocked putc
+#undef putc
+#define putc _IO_putc_unlocked
+#elif defined HAVE_PUTC_UNLOCKED
+#undef putc
+#define putc putc_unlocked
 #endif
 
-#if !defined HAVE_FREAD_UNLOCKED
-#define fread_unlocked fread
+#if defined HAVE_FREAD_UNLOCKED
+#define fread fread_unlocked
 #endif
 
-#if !defined HAVE_FWRITE_UNLOCKED
-#define fwrite_unlocked fwrite
+#if defined HAVE_FWRITE_UNLOCKED
+#define fwrite fwrite_unlocked
 #endif
 
 #if defined _IO_ferror_unlocked
-#define ferror_unlocked _IO_ferror_unlocked
-#elif !defined HAVE_FERROR_UNLOCKED
-#define ferror_unlocked ferror
+#define ferror _IO_ferror_unlocked
+#elif defined HAVE_FERROR_UNLOCKED
+#define ferror ferror_unlocked
 #endif
 
 #if defined _IO_feof_unlocked
-#define feof_unlocked _IO_feof_unlocked
-#elif !defined HAVE_FEOF_UNLOCKED
-#define feof_unlocked feof
+#define feof _IO_feof_unlocked
+#elif defined HAVE_FEOF_UNLOCKED
+#define feof feof_unlocked
 #endif
 
 #ifdef HAVE_BYTESWAP_H

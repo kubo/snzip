@@ -63,10 +63,10 @@ static int framing_format_compress(FILE *infp, FILE *outfp, size_t block_size)
   }
 
   /* write the steam header */
-  fwrite_unlocked(stream_header, sizeof(stream_header), 1, outfp);
+  fwrite(stream_header, sizeof(stream_header), 1, outfp);
 
   /* write file body */
-  while ((uncompressed_data_len = fread_unlocked(uncompressed_data, 1, max_uncompressed_data_len, infp)) > 0) {
+  while ((uncompressed_data_len = fread(uncompressed_data, 1, max_uncompressed_data_len, infp)) > 0) {
     unsigned int crc32c = masked_crc32c(uncompressed_data, uncompressed_data_len);
     char type_code;
     size_t write_len;
@@ -89,28 +89,28 @@ static int framing_format_compress(FILE *infp, FILE *outfp, size_t block_size)
     }
 
     /* write block type */
-    putc_unlocked(type_code, outfp);
+    putc(type_code, outfp);
     /* write data length */
-    putc_unlocked(((write_len + 4) >> 0), outfp);
-    putc_unlocked(((write_len + 4) >> 8), outfp);
-    putc_unlocked(((write_len + 4) >> 16), outfp);
+    putc(((write_len + 4) >> 0), outfp);
+    putc(((write_len + 4) >> 8), outfp);
+    putc(((write_len + 4) >> 16), outfp);
     /* write checksum */
-    putc_unlocked((crc32c >>  0), outfp);
-    putc_unlocked((crc32c >>  8), outfp);
-    putc_unlocked((crc32c >> 16), outfp);
-    putc_unlocked((crc32c >> 24), outfp);
+    putc((crc32c >>  0), outfp);
+    putc((crc32c >>  8), outfp);
+    putc((crc32c >> 16), outfp);
+    putc((crc32c >> 24), outfp);
     /* write data */
-    if (fwrite_unlocked(write_data, write_len, 1, outfp) != 1) {
+    if (fwrite(write_data, write_len, 1, outfp) != 1) {
       print_error("Failed to write a file: %s\n", strerror(errno));
       goto cleanup;
     }
   }
   /* check stream errors */
-  if (ferror_unlocked(infp)) {
+  if (ferror(infp)) {
     print_error("Failed to read a file: %s\n", strerror(errno));
     goto cleanup;
   }
-  if (ferror_unlocked(outfp)) {
+  if (ferror(outfp)) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     goto cleanup;
   }
@@ -123,8 +123,8 @@ static int framing_format_compress(FILE *infp, FILE *outfp, size_t block_size)
 
 static int read_data(char *buf, size_t buflen, FILE *fp)
 {
-  if (fread_unlocked(buf, buflen, 1, fp) != 1) {
-    if (feof_unlocked(fp)) {
+  if (fread(buf, buflen, 1, fp) != 1) {
+    if (feof(fp)) {
       print_error("Unexpected end of file\n");
     } else {
       print_error("Failed to read a file: %s\n", strerror(errno));
@@ -176,13 +176,13 @@ static int framing_format_uncompress(FILE *infp, FILE *outfp, int skip_magic)
   }
 
   for (;;) {
-    int id = getc_unlocked(infp);
+    int id = getc(infp);
     if (id == EOF) {
       break;
     }
-    data_len = getc_unlocked(infp);
-    data_len |= getc_unlocked(infp) << 8;
-    data_len |= getc_unlocked(infp) << 16;
+    data_len = getc(infp);
+    data_len |= getc(infp) << 8;
+    data_len |= getc(infp) << 16;
     if (data_len == (size_t)EOF) {
       print_error("Unexpected end of file\n");
       goto cleanup;
@@ -204,7 +204,7 @@ static int framing_format_uncompress(FILE *infp, FILE *outfp, int skip_magic)
       if (check_crc32c(uncompressed_data, uncompressed_data_len, data) != 0) {
         goto cleanup;
       }
-      if (fwrite_unlocked(uncompressed_data, uncompressed_data_len, 1, outfp) != 1) {
+      if (fwrite(uncompressed_data, uncompressed_data_len, 1, outfp) != 1) {
         break;
       }
     } else if (id == UNCOMPRESSED_DATA_IDENTIFIER) {
@@ -219,7 +219,7 @@ static int framing_format_uncompress(FILE *infp, FILE *outfp, int skip_magic)
       if (check_crc32c(data + 4, data_len - 4, data) != 0) {
         goto cleanup;
       }
-      if (fwrite_unlocked(data + 4, data_len - 4, 1, outfp) != 1) {
+      if (fwrite(data + 4, data_len - 4, 1, outfp) != 1) {
         break;
       }
     } else if (id < 0x80) {
@@ -229,7 +229,7 @@ static int framing_format_uncompress(FILE *infp, FILE *outfp, int skip_magic)
     } else {
       /* 4.5. Reserved skippable chunks (chunk types 0x80-0xfe) */
       while (data_len-- > 0) {
-        if (getc_unlocked(infp) == EOF) {
+        if (getc(infp) == EOF) {
           print_error("Unexpected end of file\n");
           goto cleanup;
         }
@@ -237,11 +237,11 @@ static int framing_format_uncompress(FILE *infp, FILE *outfp, int skip_magic)
     }
   }
   /* check stream errors */
-  if (ferror_unlocked(infp)) {
+  if (ferror(infp)) {
     print_error("Failed to read a file: %s\n", strerror(errno));
     goto cleanup;
   }
-  if (ferror_unlocked(outfp)) {
+  if (ferror(outfp)) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     goto cleanup;
   }

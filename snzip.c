@@ -137,7 +137,7 @@ static stream_format_t *find_stream_format_by_file_header(FILE *fp)
   int chr;
   size_t max_compressed_length;
 
-#define GETCHAR()  ((chr = getc_unlocked(fp)), (u.buf[idx++] = chr), chr)
+#define GETCHAR()  ((chr = getc(fp)), (u.buf[idx++] = chr), chr)
 #define CHK(chr) if (GETCHAR() != (chr)) goto error
   switch (GETCHAR()) {
   case 0xff:

@@ -58,29 +58,29 @@ static int iwa_compress(FILE *infp, FILE *outfp, size_t block_size)
   }
 
   /* write file body */
-  while ((uncompressed_data_len = fread_unlocked(uncompressed_data, 1, max_uncompressed_data_len, infp)) > 0) {
+  while ((uncompressed_data_len = fread(uncompressed_data, 1, max_uncompressed_data_len, infp)) > 0) {
     /* compress the block. */
     compressed_data_len = max_compressed_data_len;
     snappy_compress(uncompressed_data, uncompressed_data_len, compressed_data, &compressed_data_len);
 
     /* write block type */
-    putc_unlocked(COMPRESSED_DATA_IDENTIFIER, outfp);
+    putc(COMPRESSED_DATA_IDENTIFIER, outfp);
     /* write data length */
-    putc_unlocked((compressed_data_len >> 0), outfp);
-    putc_unlocked((compressed_data_len >> 8), outfp);
-    putc_unlocked((compressed_data_len >> 16), outfp);
+    putc((compressed_data_len >> 0), outfp);
+    putc((compressed_data_len >> 8), outfp);
+    putc((compressed_data_len >> 16), outfp);
     /* write data */
-    if (fwrite_unlocked(compressed_data, compressed_data_len, 1, outfp) != 1) {
+    if (fwrite(compressed_data, compressed_data_len, 1, outfp) != 1) {
       print_error("Failed to write a file: %s\n", strerror(errno));
       goto cleanup;
     }
   }
   /* check stream errors */
-  if (ferror_unlocked(infp)) {
+  if (ferror(infp)) {
     print_error("Failed to read a file: %s\n", strerror(errno));
     goto cleanup;
   }
-  if (ferror_unlocked(outfp)) {
+  if (ferror(outfp)) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     goto cleanup;
   }
@@ -93,8 +93,8 @@ static int iwa_compress(FILE *infp, FILE *outfp, size_t block_size)
 
 static int read_data(char *buf, size_t buflen, FILE *fp)
 {
-  if (fread_unlocked(buf, buflen, 1, fp) != 1) {
-    if (feof_unlocked(fp)) {
+  if (fread(buf, buflen, 1, fp) != 1) {
+    if (feof(fp)) {
       print_error("Unexpected end of file\n");
     } else {
       print_error("Failed to read a file: %s\n", strerror(errno));
@@ -120,7 +120,7 @@ static int iwa_uncompress(FILE *infp, FILE *outfp, int skip_magic)
   }
 
   for (;;) {
-    int id = getc_unlocked(infp);
+    int id = getc(infp);
     if (id == EOF) {
       break;
     }
@@ -128,9 +128,9 @@ static int iwa_uncompress(FILE *infp, FILE *outfp, int skip_magic)
       print_error("Invalid data identifier: 0x%02x\n", id);
       goto cleanup;
     }
-    data_len = getc_unlocked(infp);
-    data_len |= getc_unlocked(infp) << 8;
-    data_len |= getc_unlocked(infp) << 16;
+    data_len = getc(infp);
+    data_len |= getc(infp) << 8;
+    data_len |= getc(infp) << 16;
     if (data_len == (size_t)EOF) {
       print_error("Unexpected end of file\n");
       goto cleanup;
@@ -147,16 +147,16 @@ static int iwa_uncompress(FILE *infp, FILE *outfp, int skip_magic)
       print_error("Invalid data: snappy_uncompress failed\n");
       goto cleanup;
     }
-    if (fwrite_unlocked(uncompressed_data, uncompressed_data_len, 1, outfp) != 1) {
+    if (fwrite(uncompressed_data, uncompressed_data_len, 1, outfp) != 1) {
       break;
     }
   }
   /* check stream errors */
-  if (ferror_unlocked(infp)) {
+  if (ferror(infp)) {
     print_error("Failed to read a file: %s\n", strerror(errno));
     goto cleanup;
   }
-  if (ferror_unlocked(outfp)) {
+  if (ferror(outfp)) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     goto cleanup;
   }

@@ -89,13 +89,13 @@ static int comment_43_compress(FILE *infp, FILE *outfp, size_t block_size)
     goto cleanup;
   }
 
-  putc_unlocked(HEADER_TYPE_CODE, outfp);
-  putc_unlocked(MAGIC_LEN, outfp);
-  putc_unlocked(MAGIC_LEN >> 8, outfp);
-  fwrite_unlocked(MAGIC, MAGIC_LEN, 1, outfp);
+  putc(HEADER_TYPE_CODE, outfp);
+  putc(MAGIC_LEN, outfp);
+  putc(MAGIC_LEN >> 8, outfp);
+  fwrite(MAGIC, MAGIC_LEN, 1, outfp);
 
   /* write file body */
-  while ((raw_data_len = fread_unlocked(raw_data, 1, max_raw_data_len, infp)) > 0) {
+  while ((raw_data_len = fread(raw_data, 1, max_raw_data_len, infp)) > 0) {
     unsigned int crc32c = masked_crc32c(raw_data, raw_data_len);
     char type_code;
     size_t write_len;
@@ -118,29 +118,29 @@ static int comment_43_compress(FILE *infp, FILE *outfp, size_t block_size)
     }
 
     /* block type */
-    putc_unlocked(type_code, outfp);
+    putc(type_code, outfp);
     /* data length */
-    putc_unlocked(((write_len + 4) >> 0), outfp);
-    putc_unlocked(((write_len + 4) >> 8), outfp);
+    putc(((write_len + 4) >> 0), outfp);
+    putc(((write_len + 4) >> 8), outfp);
     /* data */
-    putc_unlocked((crc32c >>  0), outfp);
-    putc_unlocked((crc32c >>  8), outfp);
-    putc_unlocked((crc32c >> 16), outfp);
-    putc_unlocked((crc32c >> 24), outfp);
-    if (fwrite_unlocked(write_data, write_len, 1, outfp) != 1) {
+    putc((crc32c >>  0), outfp);
+    putc((crc32c >>  8), outfp);
+    putc((crc32c >> 16), outfp);
+    putc((crc32c >> 24), outfp);
+    if (fwrite(write_data, write_len, 1, outfp) != 1) {
       print_error("Failed to write a file: %s\n", strerror(errno));
       goto cleanup;
     }
   }
-  if (!feof_unlocked(infp)) {
-    /* fread_unlocked() failed. */
+  if (!feof(infp)) {
+    /* fread() failed. */
     print_error("Failed to read a file: %s\n", strerror(errno));
     goto cleanup;
   }
-  putc_unlocked(END_OF_STREAM_TYPE_CODE, outfp);
-  putc_unlocked(0, outfp);
-  putc_unlocked(0, outfp);
-  if (ferror_unlocked(outfp)) {
+  putc(END_OF_STREAM_TYPE_CODE, outfp);
+  putc(0, outfp);
+  putc(0, outfp);
+  if (ferror(outfp)) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     goto cleanup;
   }
@@ -174,7 +174,7 @@ static int comment_43_uncompress(FILE *infp, FILE *outfp, int skip_magic)
       }
       /* FALLTHROUGH */
     case TOO_SHORT_DATA_BLOCK:
-      if (feof_unlocked(infp)) {
+      if (feof(infp)) {
         print_error("Unexpected end of file\n");
       } else {
         print_error("Failed to read a file: %s\n", strerror(errno));
@@ -195,25 +195,25 @@ static int read_block(FILE *fp, block_data_t *bd)
   int chr;
 
   /* read block type */
-  chr = getc_unlocked(fp);
+  chr = getc(fp);
   if (chr == EOF) {
     return EOF;
   }
   bd->type = chr;
 
   /* read data length */
-  bd->data_len = chr = getc_unlocked(fp);
+  bd->data_len = chr = getc(fp);
   if (chr == EOF) {
     return TOO_SHORT_DATA_BLOCK;
   }
 
-  bd->data_len |= ((chr = getc_unlocked(fp)) << 8);
+  bd->data_len |= ((chr = getc(fp)) << 8);
   if (chr == EOF) {
     return TOO_SHORT_DATA_BLOCK;
   }
 
   /* read data */
-  if (bd->data_len > 0 && fread_unlocked(bd->data, bd->data_len, 1, fp) != 1) {
+  if (bd->data_len > 0 && fread(bd->data, bd->data_len, 1, fp) != 1) {
     return TOO_SHORT_DATA_BLOCK;
   }
   return SUCCESS;
@@ -266,7 +266,7 @@ static stream_state_t process_block(FILE *fp, stream_state_t state, block_data_t
         print_error("Invalid data: CRC32c error\n");
         return ERROR_STATE;
       }
-      if (fwrite_unlocked(work, outlen, 1, fp) != 1) {
+      if (fwrite(work, outlen, 1, fp) != 1) {
         print_error("Failed to write: %s\n", strerror(errno));
         return ERROR_STATE;
       }
@@ -285,7 +285,7 @@ static stream_state_t process_block(FILE *fp, stream_state_t state, block_data_t
         print_error("Invalid data: CRC32c error\n");
         return ERROR_STATE;
       }
-      if (fwrite_unlocked(bd->data + 4, bd->data_len - 4, 1, fp) != 1) {
+      if (fwrite(bd->data + 4, bd->data_len - 4, 1, fp) != 1) {
         print_error("Failed to write: %s\n", strerror(errno));
         return ERROR_STATE;
       }

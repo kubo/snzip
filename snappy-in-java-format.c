@@ -81,14 +81,14 @@ static int snappy_in_java_compress(FILE *infp, FILE *outfp, size_t block_size)
     goto cleanup;
   }
 
-  if (fwrite_unlocked(&snappy_in_java_header, sizeof(snappy_in_java_header), 1, outfp) != 1) {
+  if (fwrite(&snappy_in_java_header, sizeof(snappy_in_java_header), 1, outfp) != 1) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     goto cleanup;
   }
 
   /* write file body */
   work_buffer_init(&wb, block_size);
-  while ((uncompressed_length = fread_unlocked(wb.uc, 1, wb.uclen, infp)) > 0) {
+  while ((uncompressed_length = fread(wb.uc, 1, wb.uclen, infp)) > 0) {
     size_t compressed_length = wb.clen;
     unsigned int crc32c = masked_crc32c(wb.uc, uncompressed_length);
 
@@ -110,8 +110,8 @@ static int snappy_in_java_compress(FILE *infp, FILE *outfp, size_t block_size)
       }
     }
   }
-  if (!feof_unlocked(infp)) {
-    /* fread_unlocked() failed. */
+  if (!feof(infp)) {
+    /* fread() failed. */
     print_error("Failed to read a file: %s\n", strerror(errno));
     goto cleanup;
   }
@@ -124,22 +124,22 @@ static int snappy_in_java_compress(FILE *infp, FILE *outfp, size_t block_size)
 static int write_block(FILE *outfp, const char *buffer, size_t length, int compressed, unsigned int crc32c)
 {
   /* write compressed flag */
-  putc_unlocked(compressed ? COMPRESSED_FLAG : UNCOMPRESSED_FLAG, outfp);
+  putc(compressed ? COMPRESSED_FLAG : UNCOMPRESSED_FLAG, outfp);
   trace("write 1 byte for compressed flag.\n");
 
   /* write data length. */
-  putc_unlocked((length >>  8), outfp);
-  putc_unlocked((length >>  0), outfp);
+  putc((length >>  8), outfp);
+  putc((length >>  0), outfp);
   trace("write 2 bytes for data length.\n");
 
   /* write crc32c */
-  putc_unlocked((crc32c >> 24), outfp);
-  putc_unlocked((crc32c >> 16), outfp);
-  putc_unlocked((crc32c >>  8), outfp);
-  putc_unlocked((crc32c >>  0), outfp);
+  putc((crc32c >> 24), outfp);
+  putc((crc32c >> 16), outfp);
+  putc((crc32c >>  8), outfp);
+  putc((crc32c >>  0), outfp);
   trace("write 4 bytes for crc32c.\n");
 
-  if (fwrite_unlocked(buffer, length, 1, outfp) != 1) {
+  if (fwrite(buffer, length, 1, outfp) != 1) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     return -1;
   }
@@ -159,7 +159,7 @@ static int snappy_in_java_uncompress(FILE *infp, FILE *outfp, int skip_magic)
 
   if (!skip_magic) {
     /* read header */
-    if (fread_unlocked(&header, sizeof(header), 1, infp) != 1) {
+    if (fread(&header, sizeof(header), 1, infp) != 1) {
       print_error("Failed to read a file: %s\n", strerror(errno));
       goto cleanup;
     }
@@ -185,7 +185,7 @@ static int snappy_in_java_uncompress(FILE *infp, FILE *outfp, int skip_magic)
     unsigned int crc32c = 0;
 
     /* read compressed flag */
-    compressed_flag = getc_unlocked(infp);
+    compressed_flag = getc(infp);
     switch (compressed_flag) {
     case EOF:
       /* read all blocks */
@@ -201,27 +201,27 @@ static int snappy_in_java_uncompress(FILE *infp, FILE *outfp, int skip_magic)
     }
 
     /* read data length. */
-    length |= (getc_unlocked(infp) << 8);
-    length |= (getc_unlocked(infp) << 0);
+    length |= (getc(infp) << 8);
+    length |= (getc(infp) << 0);
 
     /* read crc32c. */
-    crc32c |= (getc_unlocked(infp) << 24);
-    crc32c |= (getc_unlocked(infp) << 16);
-    crc32c |= (getc_unlocked(infp) <<  8);
-    crc32c |= (getc_unlocked(infp) <<  0);
+    crc32c |= (getc(infp) << 24);
+    crc32c |= (getc(infp) << 16);
+    crc32c |= (getc(infp) <<  8);
+    crc32c |= (getc(infp) <<  0);
 
     /* check read error */
-    if (feof_unlocked(infp)) {
+    if (feof(infp)) {
       print_error("Unexpected end of file.\n");
       goto cleanup;
-    } else if (ferror_unlocked(infp)) {
+    } else if (ferror(infp)) {
       print_error("Failed to read a file: %s\n", strerror(errno));
       goto cleanup;
     }
 
     /* read data */
-    if (fread_unlocked(wb.c, length, 1, infp) != 1) {
-      if (feof_unlocked(infp)) {
+    if (fread(wb.c, length, 1, infp) != 1) {
+      if (feof(infp)) {
         print_error("Unexpected end of file\n");
       } else {
         print_error("Failed to read a file: %s\n", strerror(errno));

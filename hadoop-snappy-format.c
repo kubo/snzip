@@ -60,7 +60,7 @@ size_t hadoop_snappy_max_input_size(size_t block_size)
 static inline int write_num(FILE *fp, size_t num)
 {
   unsigned int n = SNZ_TO_BE32((unsigned int)num);
-  if (fwrite_unlocked(&n, sizeof(n), 1, fp) != 1) {
+  if (fwrite(&n, sizeof(n), 1, fp) != 1) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     return 0;
   }
@@ -76,7 +76,7 @@ static int hadoop_snappy_format_compress(FILE *infp, FILE *outfp, size_t block_s
   work_buffer_init(&wb, hadoop_snappy_max_input_size(block_size));
 
   /* write file body */
-  while ((uncompressed_data_len = fread_unlocked(wb.uc, 1, wb.uclen, infp)) > 0) {
+  while ((uncompressed_data_len = fread(wb.uc, 1, wb.uclen, infp)) > 0) {
     size_t compressed_data_len;
     /* write length before compression */
     if (write_num(outfp, uncompressed_data_len) == 0) {
@@ -92,17 +92,17 @@ static int hadoop_snappy_format_compress(FILE *infp, FILE *outfp, size_t block_s
       goto cleanup;
     }
     /* write data */
-    if (fwrite_unlocked(wb.c, compressed_data_len, 1, outfp) != 1) {
+    if (fwrite(wb.c, compressed_data_len, 1, outfp) != 1) {
       print_error("Failed to write a file: %s\n", strerror(errno));
       goto cleanup;
     }
   }
   /* check stream errors */
-  if (ferror_unlocked(infp)) {
+  if (ferror(infp)) {
     print_error("Failed to read a file: %s\n", strerror(errno));
     goto cleanup;
   }
-  if (ferror_unlocked(outfp)) {
+  if (ferror(outfp)) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     goto cleanup;
   }
@@ -114,8 +114,8 @@ static int hadoop_snappy_format_compress(FILE *infp, FILE *outfp, size_t block_s
 
 static int read_data(char *buf, size_t buflen, FILE *fp)
 {
-  if (fread_unlocked(buf, buflen, 1, fp) != 1) {
-    if (feof_unlocked(fp)) {
+  if (fread(buf, buflen, 1, fp) != 1) {
+    if (feof(fp)) {
       print_error("Unexpected end of file\n");
     } else {
       print_error("Failed to read a file: %s\n", strerror(errno));
@@ -145,8 +145,8 @@ static int hadoop_snappy_format_uncompress(FILE *infp, FILE *outfp, int skip_mag
   for (;;) {
     unsigned int n;
 
-    if (fread_unlocked(&n, sizeof(n), 1, infp) != 1) {
-      if (feof_unlocked(infp)) {
+    if (fread(&n, sizeof(n), 1, infp) != 1) {
+      if (feof(infp)) {
         err = 0;
       } else {
         print_error("Failed to read a file: %s\n", strerror(errno));
@@ -196,7 +196,7 @@ static int hadoop_snappy_format_uncompress(FILE *infp, FILE *outfp, int skip_mag
         print_error("Invalid data: RawUncompress failed\n");
         goto cleanup;
       }
-      if (fwrite_unlocked(wb.uc, uncompressed_len, 1, outfp) != 1) {
+      if (fwrite(wb.uc, uncompressed_len, 1, outfp) != 1) {
         print_error("Failed to write a file: %s\n", strerror(errno));
         goto cleanup;
       }
@@ -207,11 +207,11 @@ static int hadoop_snappy_format_uncompress(FILE *infp, FILE *outfp, int skip_mag
     }
   }
   /* check stream errors */
-  if (ferror_unlocked(infp)) {
+  if (ferror(infp)) {
     print_error("Failed to read a file: %s\n", strerror(errno));
     goto cleanup;
   }
-  if (ferror_unlocked(outfp)) {
+  if (ferror(outfp)) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     goto cleanup;
   }

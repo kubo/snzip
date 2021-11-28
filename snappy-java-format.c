@@ -72,14 +72,14 @@ static int snappy_java_compress(FILE *infp, FILE *outfp, size_t block_size)
   header.version = htonl(SNAPPY_JAVA_FILE_VERSION);
   header.compatible_version = htonl(SNAPPY_JAVA_FILE_VERSION);
 
-  if (fwrite_unlocked(&header, sizeof(header), 1, outfp) != 1) {
+  if (fwrite(&header, sizeof(header), 1, outfp) != 1) {
     print_error("Failed to write a file: %s\n", strerror(errno));
     goto cleanup;
   }
 
   /* write file body */
   work_buffer_init(&wb, block_size);
-  while ((uncompressed_length = fread_unlocked(wb.uc, 1, wb.uclen, infp)) > 0) {
+  while ((uncompressed_length = fread(wb.uc, 1, wb.uclen, infp)) > 0) {
     size_t compressed_length = wb.clen;
 
     trace("read %lu bytes.\n", (unsigned long)uncompressed_length);
@@ -89,21 +89,21 @@ static int snappy_java_compress(FILE *infp, FILE *outfp, size_t block_size)
     trace("compressed_legnth is %lu.\n", (unsigned long)compressed_length);
 
     /* write the compressed length. */
-    putc_unlocked((compressed_length >> 24), outfp);
-    putc_unlocked((compressed_length >> 16), outfp);
-    putc_unlocked((compressed_length >>  8), outfp);
-    putc_unlocked((compressed_length >>  0), outfp);
+    putc((compressed_length >> 24), outfp);
+    putc((compressed_length >> 16), outfp);
+    putc((compressed_length >>  8), outfp);
+    putc((compressed_length >>  0), outfp);
     trace("write 4 bytes for compressed data length.\n");
 
     /* write the compressed data. */
-    if (fwrite_unlocked(wb.c, compressed_length, 1, outfp) != 1) {
+    if (fwrite(wb.c, compressed_length, 1, outfp) != 1) {
       print_error("Failed to write a file: %s\n", strerror(errno));
       goto cleanup;
     }
     trace("write %ld bytes for compressed data.\n", (long)compressed_length);
   }
-  if (!feof_unlocked(infp)) {
-    /* fread_unlocked() failed. */
+  if (!feof(infp)) {
+    /* fread() failed. */
     print_error("Failed to read a file: %s\n", strerror(errno));
     goto cleanup;
   }
@@ -125,13 +125,13 @@ static int snappy_java_uncompress(FILE *infp, FILE *outfp, int skip_magic)
 
   if (skip_magic) {
     /* read header except magic */
-    if (fread_unlocked(&header.version, sizeof(header) - sizeof(header.magic), 1, infp) != 1) {
+    if (fread(&header.version, sizeof(header) - sizeof(header.magic), 1, infp) != 1) {
       print_error("Failed to read a file: %s\n", strerror(errno));
       goto cleanup;
     }
   } else {
     /* read header */
-    if (fread_unlocked(&header, sizeof(header), 1, infp) != 1) {
+    if (fread(&header, sizeof(header), 1, infp) != 1) {
       print_error("Failed to read a file: %s\n", strerror(errno));
       goto cleanup;
     }
@@ -171,7 +171,7 @@ static int snappy_java_uncompress(FILE *infp, FILE *outfp, int skip_magic)
     int idx;
 
     for (idx = 3; idx >= 0; idx--) {
-      int chr = getc_unlocked(infp);
+      int chr = getc(infp);
       if (chr == -1) {
         if (idx == 3) {
           /* read all blocks */
@@ -194,8 +194,8 @@ static int snappy_java_uncompress(FILE *infp, FILE *outfp, int skip_magic)
     }
 
     /* read the compressed data */
-    if (fread_unlocked(wb.c, compressed_length, 1, infp) != 1) {
-      if (feof_unlocked(infp)) {
+    if (fread(wb.c, compressed_length, 1, infp) != 1) {
+      if (feof(infp)) {
         print_error("Unexpected end of file\n");
       } else {
         print_error("Failed to read a file: %s\n", strerror(errno));
