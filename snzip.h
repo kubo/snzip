@@ -51,6 +51,9 @@
 #elif defined HAVE_GETC_UNLOCKED
 #undef getc
 #define getc getc_unlocked
+#elif defined HAVE__GETC_NOLOCK
+#undef getc
+#define getc _getc_nolock
 #endif
 
 #if defined _IO_putc_unlocked
@@ -59,14 +62,21 @@
 #elif defined HAVE_PUTC_UNLOCKED
 #undef putc
 #define putc putc_unlocked
+#elif defined HAVE__PUTC_NOLOCK
+#undef putc
+#define putc _putc_nolock
 #endif
 
 #if defined HAVE_FREAD_UNLOCKED
 #define fread fread_unlocked
+#elif defined HAVE__FREAD_NOLOCK
+#define fread _fread_nolock
 #endif
 
 #if defined HAVE_FWRITE_UNLOCKED
 #define fwrite fwrite_unlocked
+#elif defined HAVE__FWRITE_NOLOCK
+#define fwrite _fwrite_nolock
 #endif
 
 #if defined _IO_ferror_unlocked

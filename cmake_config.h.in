@@ -1,0 +1,22 @@
+#cmakedefine _GNU_SOURCE
+#cmakedefine DEFAULT_FORMAT @DEFAULT_FORMAT@
+#cmakedefine PACKAGE_STRING "@PACKAGE_STRING@"
+#cmakedefine HAVE_UNISTD_H
+#cmakedefine HAVE_BYTESWAP_H
+#cmakedefine HAVE_POSIX_FADVISE
+#cmakedefine HAVE_FUTIMENS
+#cmakedefine HAVE_FUTIMES
+#cmakedefine HAVE_GETC_UNLOCKED
+#cmakedefine HAVE_PUTC_UNLOCKED
+#cmakedefine HAVE_FREAD_UNLOCKED
+#cmakedefine HAVE_FWRITE_UNLOCKED
+#cmakedefine HAVE_FERROR_UNLOCKED
+#cmakedefine HAVE_FEOF_UNLOCKED
+#cmakedefine HAVE__GETC_NOLOCK
+#cmakedefine HAVE__PUTC_NOLOCK
+#cmakedefine HAVE__FREAD_NOLOCK
+#cmakedefine HAVE__FWRITE_NOLOCK
+#cmakedefine HAVE_STRUCT_STAT_ST_MTIMENSEC
+#cmakedefine HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC
+#cmakedefine HAVE_STRUCT_STAT_ST_MTIMESPEC_TV_NSEC
+#cmakedefine HAVE_SSE4_2
