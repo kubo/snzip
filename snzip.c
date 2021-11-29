@@ -62,6 +62,9 @@
 #define stat _stati64
 #define fstat _fstati64
 #endif
+#ifndef HAVE_GETOPT
+#include "win32/ya_getopt.h"
+#endif
 
 #if defined HAVE_STRUCT_STAT_ST_MTIMENSEC
 #define SNZ_ST_TIME_NSEC(sbuf, type) ((sbuf).st_##type##timensec)
@@ -137,7 +140,7 @@ static stream_format_t *find_stream_format_by_file_header(FILE *fp)
   int chr;
   size_t max_compressed_length;
 
-#define GETCHAR()  ((u.buf[idx++] = chr = getc_unlocked(fp)))
+#define GETCHAR()  ((u.buf[idx++] = chr = getc(fp)))
 #define CHK(chr) if (GETCHAR() != (chr)) goto error
   switch (GETCHAR()) {
   case 0xff:

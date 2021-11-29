@@ -39,4 +39,4 @@ uninstall-hook:
 # Use CFLAGS_SSE4_2 only for crc32_sse4_2.c.
 # Otherwise, SSE4.2 instructions may be used elsewhere.
 crc32_sse4_2.o: crc32_sse4_2.c crc32.h
-	$(COMPILE) $(CFLAGS_SSE4_2) -c crc32_sse4_2.c
+	$(COMPILE) $(CFLAGS_SSE4_2) -c $<

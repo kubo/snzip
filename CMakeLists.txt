@@ -28,6 +28,7 @@ check_symbol_exists(_getc_nolock "stdio.h" HAVE__GETC_NOLOCK)
 check_symbol_exists(_putc_nolock "stdio.h" HAVE__PUTC_NOLOCK)
 check_symbol_exists(_fread_nolock "stdio.h" HAVE__FREAD_NOLOCK)
 check_symbol_exists(_fwrite_nolock "stdio.h" HAVE__FWRITE_NOLOCK)
+check_symbol_exists(getopt "unistd.h" HAVE_GETOPT)
 
 include(CheckStructHasMember)
 CHECK_STRUCT_HAS_MEMBER("struct stat" st_mtimensec sys/stat.h HAVE_STRUCT_STAT_ST_MTIMENSEC LANGUAGE C)
@@ -72,6 +73,10 @@ set(SNZIP_SOURCES
 )
 if(HAVE_SSE4_2)
   list(APPEND SNZIP_SOURCES crc32_sse4_2.c)
+endif()
+
+if(NOT HAVE_GETOPT)
+  list(APPEND SNZIP_SOURCES win32/ya_getopt.c)
 endif()
 
 include(FetchContent)

@@ -20,3 +20,4 @@
 #cmakedefine HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC
 #cmakedefine HAVE_STRUCT_STAT_ST_MTIMESPEC_TV_NSEC
 #cmakedefine HAVE_SSE4_2
+#cmakedefine HAVE_GETOPT

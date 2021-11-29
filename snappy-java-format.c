@@ -69,8 +69,8 @@ static int snappy_java_compress(FILE *infp, FILE *outfp, size_t block_size)
 
   /* write the file header */
   memcpy(header.magic, SNAPPY_JAVA_MAGIC, SNAPPY_JAVA_MAGIC_LEN);
-  header.version = htonl(SNAPPY_JAVA_FILE_VERSION);
-  header.compatible_version = htonl(SNAPPY_JAVA_FILE_VERSION);
+  header.version = SNZ_TO_BE32(SNAPPY_JAVA_FILE_VERSION);
+  header.compatible_version = SNZ_TO_BE32(SNAPPY_JAVA_FILE_VERSION);
 
   if (fwrite(&header, sizeof(header), 1, outfp) != 1) {
     print_error("Failed to write a file: %s\n", strerror(errno));
@@ -144,13 +144,13 @@ static int snappy_java_uncompress(FILE *infp, FILE *outfp, int skip_magic)
   }
 
   /* check rest header */
-  header.version = ntohl(header.version);
+  header.version = SNZ_FROM_BE32(header.version);
   if (header.version != SNAPPY_JAVA_FILE_VERSION) {
     print_error("Unknown snappy-java version %d\n", header.version);
     goto cleanup;
   }
 
-  header.compatible_version = ntohl(header.compatible_version);
+  header.compatible_version = SNZ_FROM_BE32(header.compatible_version);
   if (header.compatible_version != SNAPPY_JAVA_FILE_VERSION) {
     print_error("Unknown snappy-java compatible version %d\n", header.compatible_version);
     goto cleanup;

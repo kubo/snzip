@@ -37,7 +37,7 @@ fi
 AC_CHECK_HEADERS([unistd.h byteswap.h])
 
 AC_SYS_LARGEFILE
-AC_CHECK_FUNCS(posix_fadvise futimens futimes)
+AC_CHECK_FUNCS(posix_fadvise futimens futimes getopt)
 AC_CHECK_MEMBERS([struct stat.st_mtimensec, struct stat.st_mtim.tv_nsec, struct stat.st_mtimespec.tv_nsec], [], [], [[
 #include <sys/types.h>
 #include <sys/stat.h>
