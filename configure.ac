@@ -134,5 +134,5 @@ AS_IF([test "x$have_snappy_uncompress_src_sink" = xyes],
 AM_CONDITIONAL([SUPPORT_RAW_FORMAT], [test "x$have_snappy_uncompress_src_sink" = xyes])
 
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([Makefile spec/snzip.spec win32/config.h])
+AC_CONFIG_FILES([Makefile spec/snzip.spec])
 AC_OUTPUT
