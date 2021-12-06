@@ -21,11 +21,11 @@ Installation
 
 ### Install from a tar-ball
 
-Download snzip-1.0.4.tar.gz from https://github.com/kubo/snzip/releases,
+Download snzip-1.0.5.tar.gz from https://github.com/kubo/snzip/releases,
 uncompress and untar it, and run configure.
 
-    tar xvfz snzip-1.0.4.tar.gz
-    cd snzip-1.0.4
+    tar xvfz snzip-1.0.5.tar.gz
+    cd snzip-1.0.5
     ./configure
     make
     make install
@@ -34,8 +34,8 @@ If you didn't install snappy under `/usr` or `/usr/local`, you need to specify
 the location by `--with-snappy` as follows.
 
     # install snzip
-    tar xvfz snzip-1.0.4.tar.gz
-    cd snzip-1.0.4
+    tar xvfz snzip-1.0.5.tar.gz
+    cd snzip-1.0.5
     ./configure --with-snappy=/xxx/yyy/
     make
     make install
@@ -53,12 +53,12 @@ You can use `--with-default-format` to change the default compression format.
 
 ### Install as a rpm package
 
-We don't provide rpm packages. You need to download snzip-1.0.4.tar.gz
+We don't provide rpm packages. You need to download snzip-1.0.5.tar.gz
 from https://github.com/kubo/snzip/releases, create a rpm package as follows and
 install it.
 
     # The rpm package will be created under $HOME/rpmbuild/RPMS.
-    rpmbuild -tb snzip-1.0.4.tar.gz 
+    rpmbuild -tb snzip-1.0.5.tar.gz 
 
 ### Install from the latest source
 
@@ -73,7 +73,7 @@ To use source code in the github repository.
 
 ### Install a Windows package.
 
-Download `snzip-1.0.4-win32.zip` or `snzip-1.0.4-win64.zip` from
+Download `snzip-1.0.5-win32.zip` or `snzip-1.0.5-win64.zip` from
 https://github.com/kubo/snzip/releases and copy `snzip.exe` and `snunzip.exe`
 to a directory in the PATH environment variable.
 

@@ -1,3 +1,10 @@
+snzip 1.0.5 - 2021-12-06
+
+* Fix a problem to read concatenated framing format data from stdin. (#28)
+* Install snunzip and snzcat also by `make install` (#21)
+* Add CMakeLists.txt to compile Windows binary.
+* Change uncompressed file's file name when its suffix is not expected.
+
 snzip 1.0.4 - 2016-10-02
 
 * Add Apple iWork .iwa format support. (#14)
