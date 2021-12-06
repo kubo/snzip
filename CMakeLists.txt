@@ -96,5 +96,5 @@ endif()
 
 add_executable(snzip ${SNZIP_SOURCES})
 target_include_directories(snzip PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-add_definitions(-DHAVE_CONFIG_H)
+add_definitions(-DHAVE_CONFIG_H -DSUPPORT_RAW_FORMAT)
 target_link_libraries(snzip PRIVATE snappy)
