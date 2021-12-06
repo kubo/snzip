@@ -387,12 +387,22 @@ int main(int argc, char **argv)
     } else {
       size_t suffixlen = strlen(fmt->suffix);
       if (opt_uncompress) {
-        if (infilelen - suffixlen >= sizeof(outfile)) {
+        /* check suffix */
+        const char *suffix = strrchr(infile, '.');
+        int remove_suffix = (suffix != NULL && strcmp(suffix + 1, fmt->suffix) == 0);
+        size_t new_size = infilelen + (remove_suffix ? (- suffixlen) : 4);
+        if (new_size >= sizeof(outfile)) {
           print_error("%s has too long file name.\n", infile);
           exit(1);
         }
-        memcpy(outfile, infile, infilelen - suffixlen - 1);
-        outfile[infilelen - suffixlen - 1] = '\0';
+        if (remove_suffix) {
+          memcpy(outfile, infile, infilelen - suffixlen - 1);
+          outfile[infilelen - suffixlen - 1] = '\0';
+        } else {
+          fprintf(stderr, "%s: Can't guess original name for %s -- using %s.out\n",
+                  progname, infile, infile);
+          snprintf(outfile, sizeof(outfile), "%s.out", infile);
+        }
       } else {
         if (infilelen + suffixlen + 2 >= sizeof(outfile)) {
           print_error("%s has too long file name.\n", infile);

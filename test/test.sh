@@ -71,4 +71,14 @@ if $SNZIP -h 2>&1 | grep ' raw ' > /dev/null; then
 else
   echo 'Skip raw format tests'
 fi
+
+echo uncompress a file with unknown suffix
+cp $TESTDIR/plain/alice29.txt $TESTDIR/alice29.txt
+$SNZIP -t framing2 $TESTDIR/alice29.txt
+mv $TESTDIR/alice29.txt.sz $TESTDIR/alice29.txt.snappy
+$SNZIP -d -t framing2 $TESTDIR/alice29.txt.snappy
+cmp $TESTDIR/alice29.txt.snappy.out $TESTDIR/plain/alice29.txt
+rm $TESTDIR/alice29.txt.snappy.out
+echo ""
+
 echo Success
