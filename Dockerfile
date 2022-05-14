@@ -17,4 +17,5 @@ FROM --platform=linux/amd64 ubuntu:20.04
 
 ## TODO: Change <Path in Builder Stage>
 COPY --from=builder /snzip/snzip /
-
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y libsnappy-dev snapd libsnappy1v5
